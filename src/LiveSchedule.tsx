@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CalendarDays, CheckCircle2, Clock3, Plus, RefreshCw, Zap, Bell, ShieldAlert, Trash2, UserRound } from 'lucide-react';
 import { supabase } from './auth';
-import type { DemoState, DiaryBlock, OneOffWindow, SlotSelection, Transmission, WeeklyWindow } from './model';
+import LiveBookings from './LiveBookings';
+import type { DemoState, DiaryBlock, OneOffWindow, SlotSelection, TestBusySlot, Transmission, WeeklyWindow } from './model';
 import { availableRecurringSeries, DAYS, formatDay, isoDay, seriesAvailable, slotsForDate, suggestedOpening, timeMinutes, ukClock, validWindow } from './scheduling';
 
 type View = 'instructor' | 'learner';
@@ -9,20 +10,24 @@ type Listing = {user_id:string;display_name:string;transmission:'Manual'|'Automa
 type WindowRow = {id:string;instructor_id:string;weekday:number;start_time:string;end_time:string};
 type BlockRow = {id:string;instructor_id:string;block_date:string;start_time:string;end_time:string};
 type OpeningRow = {id:string;instructor_id:string;opening_date:string;start_time:string;end_time:string;source:'extra'|'cancellation'};
+type BusyRow = {instructor_id:string;lesson_date:string;lesson_time:string;duration_minutes:number};
 const initialOpening=suggestedOpening();
 
 function normalTime(value:string):string{return value.slice(0,5);}
 function publicTransmission(t:Listing['transmission'], wanted:Transmission):boolean{return t==='Both'||t===wanted;}
-function createEmptyState(windows:WindowRow[],blocks:BlockRow[],openings:OpeningRow[]):DemoState{
+function createEmptyState(windows:WindowRow[],blocks:BlockRow[],openings:OpeningRow[],busy:BusyRow[]):DemoState{
   const weeklyWindows:WeeklyWindow[]=windows.map(w=>({id:w.id,instructorId:w.instructor_id,weekday:w.weekday,start:normalTime(w.start_time),end:normalTime(w.end_time)}));
   const diaryBlocks:DiaryBlock[]=blocks.map(b=>({id:b.id,instructorId:b.instructor_id,date:b.block_date,start:normalTime(b.start_time),end:normalTime(b.end_time),note:'Unavailable'}));
   const oneOffWindows:OneOffWindow[]=openings.map(o=>({
     id:o.id,instructorId:o.instructor_id,date:o.opening_date,
     start:normalTime(o.start_time),end:normalTime(o.end_time),source:o.source
   }));
-  return {weeklyWindows,diaryBlocks,oneOffWindows,lessons:[],instructorOnline:false,learnerSelfSkill:5};
+  const testBusySlots:TestBusySlot[]=busy.map(b=>({
+    instructorId:b.instructor_id,date:b.lesson_date,time:normalTime(b.lesson_time),duration:b.duration_minutes
+  }));
+  return {weeklyWindows,diaryBlocks,oneOffWindows,testBusySlots,lessons:[],instructorOnline:false,learnerSelfSkill:5};
 }
-const emptyState=createEmptyState([],[],[]);
+const emptyState=createEmptyState([],[],[],[]);
 const maxDate=isoDay(ukClock().date,90);
 
 export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstructorId,focusDate}:{
@@ -34,6 +39,7 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
   const [windows,setWindows]=useState<WindowRow[]>([]);
   const [blocks,setBlocks]=useState<BlockRow[]>([]);
   const [openings,setOpenings]=useState<OpeningRow[]>([]);
+  const [busySlots,setBusySlots]=useState<BusyRow[]>([]);
   const [openingDate,setOpeningDate]=useState(initialOpening.date);
   const [openingStart,setOpeningStart]=useState(initialOpening.start);
   const [openingEnd,setOpeningEnd]=useState(initialOpening.end);
@@ -74,7 +80,7 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
 
   useEffect(()=>{
     const client=supabase;
-    if(!client||!userId){setListings([]);setWindows([]);setBlocks([]);setOpenings([]);setError('');return;}
+    if(!client||!userId){setListings([]);setWindows([]);setBlocks([]);setOpenings([]);setBusySlots([]);setError('');return;}
     let active=true;
     async function load(){
       if(!client||!userId)return;
@@ -88,26 +94,29 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
         const list=(listingResult.data??[]) as Listing[];
         const ids=list.map(x=>x.user_id);
         if(!ids.length){
-          if(active){setListings([]);setWindows([]);setBlocks([]);setOpenings([]);}
+          if(active){setListings([]);setWindows([]);setBlocks([]);setOpenings([]);setBusySlots([]);}
           return;
         }
-        const [windowResult,blockResult,openingResult]=await Promise.all([
+        const [windowResult,blockResult,openingResult,busyResult]=await Promise.all([
           client.from('instructor_live_windows').select('id,instructor_id,weekday,start_time,end_time').in('instructor_id',ids),
           client.from('instructor_live_blocks').select('id,instructor_id,block_date,start_time,end_time').in('instructor_id',ids),
-          client.from('instructor_live_openings').select('id,instructor_id,opening_date,start_time,end_time,source').in('instructor_id',ids)
+          client.from('instructor_live_openings').select('id,instructor_id,opening_date,start_time,end_time,source').in('instructor_id',ids),
+          client.rpc('get_test_busy_slots',{p_instructor_ids:ids})
         ]);
         if(windowResult.error)throw windowResult.error;
         if(blockResult.error)throw blockResult.error;
         if(openingResult.error)throw openingResult.error;
+        if(busyResult.error)throw busyResult.error;
         if(active){
           setListings(list);
           setWindows((windowResult.data??[]) as WindowRow[]);
           setBlocks((blockResult.data??[]) as BlockRow[]);
           setOpenings((openingResult.data??[]) as OpeningRow[]);
+          setBusySlots((busyResult.data??[]) as BusyRow[]);
         }
       }catch(e){
         if(active){
-          setListings([]);setWindows([]);setBlocks([]);setOpenings([]);
+          setListings([]);setWindows([]);setBlocks([]);setOpenings([]);setBusySlots([]);
           setError(e instanceof Error?e.message:'Could not load live availability. Try refreshing.');
         }
       }finally{if(active)setLoading(false);}
@@ -128,7 +137,7 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
   const visible=listings.filter(l=>l.published&&publicTransmission(l.transmission,transmission));
   const activeId=visible.some(x=>x.user_id===selectedInstructor)?selectedInstructor:(visible[0]?.user_id??'');
   const active=visible.find(l=>l.user_id===activeId);
-  const liveState=useMemo(()=>createEmptyState(windows,blocks,openings),[windows,blocks,openings]);
+  const liveState=useMemo(()=>createEmptyState(windows,blocks,openings,busySlots),[windows,blocks,openings,busySlots]);
   const daySlots=active?slotsForDate(activeId,date,duration,liveState):[];
   const soon=active?slotsForDate(activeId,ukClock().date,duration,liveState)
     .filter(s=>timeMinutes(s.time)<=ukClock().minutes+360):[];
@@ -204,6 +213,24 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
     }),openingSource==='cancellation'?'Cancellation opening published to your test diary.':'One-off availability added to your test diary.');
   }
 
+  async function requestTestLesson(slot:SlotSelection){
+    const client=supabase;
+    if(!client||!userId||!active||busy)return;
+    setBusy(true);setNotice('');setError('');
+    try{
+      const {error:requestError}=await client.rpc('request_single_test_lesson',{
+        p_instructor_id:activeId,p_lesson_date:slot.date,p_lesson_time:slot.time,
+        p_duration_minutes:slot.duration,p_transmission:transmission,p_request_id:crypto.randomUUID()
+      });
+      if(requestError)throw requestError;
+      setNotice('Test lesson requested. The instructor can accept or decline it in their live diary below. No payment was taken.');
+      setReload(n=>n+1);
+    }catch(e){
+      setError(e instanceof Error?e.message:'Unable to request the test lesson. This time may be taken.');
+      setReload(n=>n+1);
+    }finally{setBusy(false);}
+  }
+
   function toggleCustom(slot:SlotSelection) {
     setCustomSlots(old=>{
       const exists=old.some(x=>x.date===slot.date&&x.time===slot.time);
@@ -225,6 +252,7 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
 
     {view==='instructor'&&!loading&&!own&&<div className="live-card"><h2>Instructor account needed</h2><p>This account is not registered as an instructor. Create a separate instructor test account using a different email address to manage a calendar.</p><button type="button" className="booking-continue" onClick={onOpenAccount}>Open account page <ArrowRight size={17}/></button></div>}
     {view==='instructor'&&own&&<>
+      <LiveBookings view="instructor" refreshKey={reload} onChanged={()=>setReload(n=>n+1)} onOpenAccount={onOpenAccount}/>
       <div className="live-card live-publish"><div><span className="eyebrow">DISCOVERY VISIBILITY</span><h2>{own.display_name}</h2><p>Transmission: {own.transmission}. Your calendar is <strong>{own.published?'visible to signed-in test learners':'private'}</strong>.</p><small>Publishing does not verify your instructor credentials or enable lessons.</small></div><label className="live-toggle"><input type="checkbox" checked={own.published} disabled={busy} onChange={e=>{
         const client=supabase;
         if(client&&userId)void apply(()=>client.from('instructor_live_listings').update({published:e.target.checked}).eq('user_id',userId),'Listing visibility updated.');
@@ -273,18 +301,21 @@ export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstr
     </>}
 
     {view==='learner'&&<>
+      <LiveBookings view="learner" refreshKey={reload} onChanged={()=>setReload(n=>n+1)} onOpenAccount={onOpenAccount}/>
       <div className="live-alerts-promo"><div><span className="eyebrow">DON'T MISS A CANCELLATION</span><strong><Bell size={19}/> Get automatic cancellation alerts</strong><p>Opt in to a private in-app inbox for last-minute cancellations. No bookings, payments, texts or push notifications.</p></div><button type="button" onClick={onOpenAlerts}>Manage alerts <ArrowRight size={17}/></button></div>
       <div className="live-card"><h2>Search published instructor test diaries</h2><div className="booking-mode-tabs" role="group" aria-label="Search type"><button type="button" className={mode==='now'?'active':''} onClick={()=>setMode('now')}>Book now preview</button><button type="button" className={mode==='ahead'?'active':''} onClick={()=>setMode('ahead')}>Book ahead preview</button><button type="button" className={mode==='block'?'active':''} onClick={()=>setMode('block')}>Block availability</button></div>
         <div className="live-search-fields"><label>Transmission<select value={transmission} onChange={e=>{setTransmission(e.target.value as Transmission);setCustomSlots([]);}}><option>Manual</option><option>Automatic</option></select></label><label>Instructor<select value={activeId} onChange={e=>{setSelectedInstructor(e.target.value);setCustomSlots([]);}} disabled={!visible.length}>{visible.length?visible.map(l=><option key={l.user_id} value={l.user_id}>{l.display_name}</option>):<option value="">No published test instructors</option>}</select></label><label>Duration<select value={duration} onChange={e=>{setDuration(Number(e.target.value));setCustomSlots([]);}}>{[60,90,120].map(min=><option value={min} key={min}>{min} minutes</option>)}</select></label>{mode!=='now'&&<label>Find on<input type="date" min={ukClock().date} max={maxDate} value={date} onChange={e=>setDate(e.target.value)}/></label>}</div>
         {mode==='block'&&<div className="live-search-fields"><label>Lessons<select value={count} onChange={e=>{setCount(Number(e.target.value));setCustomSlots([]);}}><option value={5}>5</option><option value={10}>10</option></select></label><label>Schedule pattern<select value={pattern} onChange={e=>{setPattern(e.target.value as 'weekly'|'custom');setCustomSlots([]);}}><option value="weekly">Same time each week</option><option value="custom">Pick individual dates</option></select></label></div>}
       </div>
       {!loading&&listings.filter(x=>x.published).length===0&&<div className="booking-empty">No instructors have published test availability yet. An instructor must register, add hours and opt in to publishing before anything appears here.</div>}
-      {active&&<div className="live-card"><div className="live-result-header"><div><span className="eyebrow">PUBLISHED TEST LISTING · NOT VERIFIED</span><h2>{active.display_name} · {active.transmission}</h2><p>{mode==='now'?'Open starts in the next six hours':mode==='ahead'?'Available starts on '+formatDay(date):pattern==='weekly'?'Complete '+count+'-week series beginning '+formatDay(date):'Select '+count+' individual available times'}</p></div><span className="live-nobook">No booking available</span></div>
+      {active&&<div className="live-card"><div className="live-result-header"><div><span className="eyebrow">PUBLISHED TEST LISTING · NOT VERIFIED</span><h2>{active.display_name} · {active.transmission}</h2><p>{mode==='now'?'Open starts in the next six hours':mode==='ahead'?'Available starts on '+formatDay(date):pattern==='weekly'?'Complete '+count+'-week series beginning '+formatDay(date):'Select '+count+' individual available times'}</p></div><span className="live-nobook">TEST LESSONS ONLY</span></div>
         {mode==='now'&&soon.some(slot=>oneOffSource(slot)==='cancellation')&&<p className="live-cancellation-alert"><Zap size={18}/> Last-minute cancellation availability has been added by this instructor.</p>}
-        {mode==='block'&&pattern==='weekly'?<div className="live-slot-grid">{recurring.length?recurring.map(series=><div className="live-available-option" key={series[0].time}><strong>{series[0].time}</strong><span>{series.length} matching weekly dates</span><small>{series.map(x=>formatDay(x.date)).join(' · ')}</small></div>):<p className="booking-empty">No complete {count}-week pattern available here. Try another date, instructor or duration.</p>}</div>:<div className="live-slot-grid">{relevantSlots.length?relevantSlots.map(slot=>pattern==='custom'&&mode==='block'?<button className={'live-slot-choice '+(customSlots.some(s=>s.date===slot.date&&s.time===slot.time)?'selected':'')} type="button" key={slot.date+slot.time} onClick={()=>toggleCustom(slot)}>{slot.time}<small>{formatDay(slot.date)}{oneOffSource(slot)==='cancellation'?' · Cancellation':''}</small></button>:<span className="live-available-option" key={slot.date+slot.time}><strong>{slot.time}</strong>{oneOffSource(slot)&&<span className="live-cancellation-tag"><Zap size={12}/>{oneOffSource(slot)==='cancellation'?'Cancellation gap':'Extra one-off slot'}</span>}<small>{formatDay(slot.date)} · Available to view only</small></span>):<p className="booking-empty">No available starts for this selection. Try another date or instructor.</p>}</div>}
+        {mode==='block'&&pattern==='weekly'?<div className="live-slot-grid">{recurring.length?recurring.map(series=><div className="live-available-option" key={series[0].time}><strong>{series[0].time}</strong><span>{series.length} matching weekly dates</span><small>{series.map(x=>formatDay(x.date)).join(' · ')}</small></div>):<p className="booking-empty">No complete {count}-week pattern available here. Try another date, instructor or duration.</p>}</div>:<div className="live-slot-grid">{relevantSlots.length?relevantSlots.map(slot=>pattern==='custom'&&mode==='block'?<button className={'live-slot-choice '+(customSlots.some(s=>s.date===slot.date&&s.time===slot.time)?'selected':'')} type="button" key={slot.date+slot.time} onClick={()=>toggleCustom(slot)}>{slot.time}<small>{formatDay(slot.date)}{oneOffSource(slot)==='cancellation'?' · Cancellation':''}</small></button>:<span className="live-available-option" key={slot.date+slot.time}><strong>{slot.time}</strong>{oneOffSource(slot)&&<span className="live-cancellation-tag"><Zap size={12}/>{oneOffSource(slot)==='cancellation'?'Cancellation gap':'Extra one-off slot'}</span>}<small>{formatDay(slot.date)} · Subject to final server validation</small>
+          {mode!=='block'&&<button type="button" className="test-booking-accept live-test-request" disabled={busy} onClick={()=>void requestTestLesson(slot)}><CalendarDays size={15}/> Request test lesson</button>}
+        </span>):<p className="booking-empty">No available starts for this selection. Try another date or instructor.</p>}</div>}
         {mode==='block'&&pattern==='custom'&&<div className="live-selected"><h3>Previewed sessions · {customSlots.length}/{count}</h3><p>Change the date above to find more sessions. Your selections remain visible but do not reserve anything.</p><div>{customSlots.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(x=><span key={x.date+x.time}>{formatDay(x.date)} · {x.time}</span>)}</div>{customValid&&<p className="diary-feedback">All selected test slots are currently open. No hold or booking has been created.</p>}</div>}
       </div>}
     </>}
-    <p className="diary-caveat"><ShieldAlert size={16}/> Browser-local demo bookings are NOT linked to these live schedules. Real paid booking requires identity verification, cross-user conflict protection, and a server reservation transaction.</p>
+    <p className="diary-caveat"><ShieldAlert size={16}/> This page creates only shared TEST lesson requests with database conflict protection. The fictional demo, identity verification and all real paid lessons remain separate. No payment or charge is possible.</p>
   </section>;
 }

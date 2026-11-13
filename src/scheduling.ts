@@ -103,6 +103,11 @@ export function isSlotOpen(instructorId:string,slot:SlotSelection,state:DemoStat
   if(!activeIntervals(instructorId,slot.date,state).some(w=>start>=w.start&&start+slot.duration<=w.end))return false;
   if(state.diaryBlocks.some(b=>b.instructorId===instructorId && blocksSlot(b,slot)))return false;
   if(state.lessons.some(l=>l.instructorId===instructorId && lessonOverlaps(l,slot)))return false;
+  if(state.testBusySlots?.some(other=>
+    other.instructorId===instructorId&&other.date===slot.date
+    &&overlaps(start-TRAVEL_BUFFER_MINUTES,start+slot.duration+TRAVEL_BUFFER_MINUTES,
+      timeMinutes(other.time),timeMinutes(other.time)+other.duration)
+  ))return false;
   return true;
 }
 export function seriesAvailable(instructorId:string,slots:SlotSelection[],state:DemoState,now=new Date()):boolean {

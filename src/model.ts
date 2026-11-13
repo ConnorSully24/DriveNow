@@ -7,6 +7,7 @@ export interface SlotSelection { date: string; time: string; duration: number; }
 export interface WeeklyWindow { id: string; instructorId: string; weekday: number; start: string; end: string; }
 export interface DiaryBlock { id: string; instructorId: string; date: string; start: string; end: string; note: string; }
 export interface OneOffWindow { id: string; instructorId: string; date: string; start: string; end: string; source: 'cancellation' | 'extra'; }
+export interface TestBusySlot { instructorId:string; date:string; time:string; duration:number; }
 
 export interface Instructor {
   id: string;
@@ -59,6 +60,7 @@ export interface DemoState {
   weeklyWindows: WeeklyWindow[];
   diaryBlocks: DiaryBlock[];
   oneOffWindows: OneOffWindow[];
+  testBusySlots?: TestBusySlot[];
   learnerSelfSkill: number;
 }
 
