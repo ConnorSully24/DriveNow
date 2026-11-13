@@ -179,3 +179,7 @@ create trigger on_new_instructor after insert on auth.users
 -- An instructor assessment average, excluding the original self-rating,
 -- replaces the one-time signup rating as soon as the first score is recorded.
 -- Not live until server-side lesson and review APIs exist.
+
+-- Keep auth trigger functions internal; they run through triggers, not client API calls.
+revoke all on function public.new_learner_profile() from public, anon, authenticated;
+revoke all on function public.new_instructor_profile() from public, anon, authenticated;

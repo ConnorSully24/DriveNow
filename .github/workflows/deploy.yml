@@ -33,8 +33,8 @@ jobs:
           # Remove this before accepting public registrations.
           VITE_ENABLE_DEMO_MODE: 'true'
           # Configure as repository variables (Settings > Secrets and variables > Actions > Variables).
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://rczevxwthnhejcxokmoz.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_zpLFHEWgHF5jtT-H1szNjw_YMyxQdCH' }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
       - name: Configure Pages

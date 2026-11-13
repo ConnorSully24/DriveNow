@@ -1,3 +1,11 @@
+
+### Supabase test project connected (13 November 2026)
+
+A Supabase test project has been connected to the GitHub Pages build using **public, browser-safe** project URL and Supabase publishable key. The workflow reads repository Actions variables when present, otherwise uses the public fallback values. No secret/service-role key, database password, or personal credentials are stored in the repository. To rotate the public key, update the repository variables or the workflow fallback.
+
+The `drivenow_initial_profiles_20261113` SQL migration was applied successfully. Four RLS-protected tables now exist: learner_profiles, learner_verifications, instructor_profiles and instructor_verifications, with signup triggers for both roles. Verified/approved status **cannot** be self-assigned by ordinary users. Real email sign-up still requires configuring Auth **Site URL** and redirect allowlist in the Supabase dashboard, and should be tested with fictional identities. **Real driving entitlement and instructor verification are NOT enabled; the booking and diary remain browser-local demo systems.**
+
+---
 ## Availability calendar and block-booking demo (13 November 2026)
 
 The app now has **three learner booking options**: Book now (starts in the next 6 hours with at least 30 minutes notice), Book ahead (single available lesson), and Block booking (5 or 10 lessons). Block booking supports a recurring **same day/time every week** pattern or **individually chosen dates**. The recurring option only offers a time when **all** sessions are available; custom selection retains its dates as the learner browses. The demo checkout lists every session and the total illustrative price (no discounts or payments yet).
