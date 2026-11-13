@@ -107,10 +107,20 @@ test('blocked time and requested lessons take priority over an ad-hoc opening',(
 });
 
 test('last-minute openings respect UK lead time and avoid midnight',()=>{
-  assert.deepEqual(suggestedOpening(NOW),{date:'2026-11-13',start:'08:30',end:'09:30'});
+  assert.deepEqual(suggestedOpening(NOW),{date:'2026-11-13',start:'09:00',end:'10:00'});
   assert.deepEqual(suggestedOpening(new Date('2026-11-13T23:40:00Z')),{date:'2026-11-14',start:'09:00',end:'10:00'});
   const s=state();s.weeklyWindows=[];
   s.oneOffWindows=[{id:'soon',instructorId:'sample',date,start:'08:00',end:'10:00',source:'extra'}];
   assert.equal(isSlotOpen('sample',slot('08:00'),s,NOW),false);
   assert.equal(isSlotOpen('sample',slot('08:30'),s,NOW),true);
+});
+
+test('adjacent recurring and one-off windows allow 90-minute lessons spanning both',()=>{
+  const s=state();s.weeklyWindows=[{id:'regular',instructorId:'sample',weekday:5,start:'09:00',end:'12:00'}];
+  s.oneOffWindows=[{id:'extension',instructorId:'sample',date,start:'12:00',end:'14:00',source:'extra'}];
+  assert.equal(isSlotOpen('sample',slot('11:30',date,90),s,NOW),true);
+  const times=slotsForDate('sample',date,90,s,NOW).map(x=>x.time);
+  assert.ok(times.includes('11:30'));
+  assert.ok(times.includes('12:00'));
+  assert.equal(times.filter(x=>x==='12:00').length,1);
 });

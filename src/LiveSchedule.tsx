@@ -185,7 +185,7 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
       setError('The one-off start time must be before the finish time.');return;
     }
     const days=Math.round((Date.parse(openingDate+'T00:00:00Z')-Date.parse(clock.date+'T00:00:00Z'))/86400000);
-    if(days*1440+timeMinutes(openingStart)<clock.minutes+30){
+    if(days*1440+timeMinutes(openingStart)<clock.minutes+31){
       setError('Allow at least 30 minutes notice before a same-day opening.');return;
     }
     const blocked=ownBlocks.some(b=>b.block_date===openingDate

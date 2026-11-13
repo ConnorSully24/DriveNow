@@ -65,7 +65,7 @@ export default function InstructorDiary({instructor,demo,onAddWindow,onRemoveWin
       setMessage('Choose a valid date within 90 days and a start before finish.');return;
     }
     const dayOffset=Math.round((Date.parse(oneOffDate+'T00:00:00Z')-Date.parse(clock.date+'T00:00:00Z'))/86400000);
-    if(dayOffset*1440+timeMinutes(oneOffStart)<clock.minutes+30){
+    if(dayOffset*1440+timeMinutes(oneOffStart)<clock.minutes+31){
       setMessage('Please allow at least 30 minutes notice for a one-off opening.');return;
     }
     if(blocks.some(b=>b.date===oneOffDate&&timeMinutes(oneOffStart)<timeMinutes(b.end)&&timeMinutes(b.start)<timeMinutes(oneOffEnd))){
