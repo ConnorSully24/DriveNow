@@ -1,3 +1,13 @@
+## Visual direction — editorial light redesign (13 November 2026)
+
+DriveNow has been restyled to feel like a considered UK service rather than a generic AI landing page. The app uses **plain authored CSS, not Tailwind** (and no CSS utility framework). The updated homepage uses an **uneven editorial split**: spacious, left-aligned copy and an off-centre custom SVG route illustration rather than a central floating graphic. The entire stylesheet contains **no gradients**; instead, flat warm off-whites, forest greens, paper-like surfaces, subdued borders and restrained clay details establish hierarchy. Large violet/neon accents and gratuitous glassy shadows were removed throughout the demo, account, instructor and Supabase test interfaces. Newsreader is used sparingly for italic headline emphasis, with DM Sans for functional interface text.
+
+The sidebar, header, mobile nav, PWA icon, manifest background and browser theme have been brought into the same light palette. Accessibility: visible keyboard focus, preserved contrast on primary calls to action, responsive hero below 690px, and no animation required for meaning. No booking, account, availability, cancellation-alert or payment logic has been altered.
+
+The design changes can be reverted using Git history if the next round of visual feedback calls for a different direction.
+
+---
+
 ## Milestone: authenticated, conflict-safe SINGLE TEST lesson requests (November 2026)
 
 **Implemented in the Supabase TEST environment only.** Live learner availability now offers a **Request test lesson** action for the Book now and Book ahead previews. This invokes the backend `request_single_test_lesson` RPC, which authorises a genuine learner profile, validates published instructor transmission, upcoming date and at least 30 minutes' notice, checks the union of recurring and ad-hoc working time and all blocked periods, and writes a pending lesson record. No payment or charge is possible. The regular fictional demo bookings remain separate.
