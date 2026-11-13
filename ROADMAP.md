@@ -22,8 +22,10 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 
 ## Phase 1 — Availability calendar and booking discovery (P0 / next feature)
 ### Instructor schedule
-- [ ] Set weekly recurring hours and one-off openings.
-- [ ] Create/remove blackout dates, holidays, breaks and existing external commitments.
+- [x] DEMO: Set weekly recurring hours and one-off openings (single-browser localStorage, not live).
+- [ ] PRODUCTION: Set recurring hours through authenticated instructor-managed shared database.
+- [x] DEMO: Add/remove full-day or partial-day blackout dates and see booked/requested lessons.
+- [ ] PRODUCTION: Persist exceptions and external commitments in shared database.
 - [ ] Configure lesson durations (60/90/120 min), hourly price, pickup service area, transmission, travel/setup buffer and minimum notice.
 - [ ] View a mobile day/week calendar with free, held and booked states.
 - [ ] "Available now" opt-in and ability to offer last-minute cancellations.
@@ -35,10 +37,12 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 3. **Block booking:** see instructors who can accommodate a **series** of lessons, then reserve the series together.
 
 ### Block booking requirements (part of the booking engine, not just a discount package)
-- [ ] Dedicated **Block booking** option visible in the main booking interface beside Book now and Book ahead.
+- [x] DEMO: **Block booking** option beside Book now and Book ahead; same time weekly or individually selected dates.
+- [ ] PRODUCTION: Authenticate and persist book-now, book-ahead and block bookings across users.
 - [ ] Learner selects number of lessons (suggest starting with 5 or 10), lesson duration, transmission, postcode/area, preferred instructor, first date and preferred days/times.
 - [ ] Offer **same day/time every week** (e.g. five Tuesdays at 6pm) and **choose dates individually**.
-- [ ] Show only instructors with availability for the entire selected series; display which dates fit, which conflict, and alternative patterns if required.
+- [x] DEMO: Filter recurring start times to those with a complete 5/10-lesson series (same browser only).
+- [ ] PRODUCTION: Show shared inventory, conflict reasons and alternative date patterns.
 - [ ] In a single calendar, show each proposed session, total lesson-hours, individual prices, potential package savings (if offered), and total block price before checkout.
 - [ ] Reserve all selected slots atomically; handle conflicts by suggesting replacement slots rather than silently double-booking or charging for unavailable lessons.
 - [ ] Booking status / payment rules: hold all chosen slots briefly; confirm all on successful authorised payment/acceptance; release holds on expiry/decline/error.
@@ -84,6 +88,9 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 - [ ] Apple TestFlight and Google Play closed testing.
 - [ ] Privacy policy, data removal, demo credentials for app reviewers, app-store assets, bug/performance testing.
 - [ ] Launch only after a functional production booking and verification system exists.
+
+## Progress note (13 November 2026)
+The instructor availability diary, learner three-way slot browser and block-booking demo UI are now built. They are local-only prototypes, **not** live marketplace inventory. The next milestone is the shared authenticated database and truly atomic reservation holds.
 
 ## Important sequencing
 1. **Build schedule demo UI first** to validate instructor weekly hours and learner one-off/block booking navigation.

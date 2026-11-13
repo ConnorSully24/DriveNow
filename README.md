@@ -1,3 +1,25 @@
+## Availability calendar and block-booking demo (13 November 2026)
+
+The app now has **three learner booking options**: Book now (starts in the next 6 hours with at least 30 minutes notice), Book ahead (single available lesson), and Block booking (5 or 10 lessons). Block booking supports a recurring **same day/time every week** pattern or **individually chosen dates**. The recurring option only offers a time when **all** sessions are available; custom selection retains its dates as the learner browses. The demo checkout lists every session and the total illustrative price (no discounts or payments yet).
+
+In **Instructor → Availability diary**, an instructor can change their demo weekly working windows, add/remove multiple windows for a weekday, and block full days or partial days. Existing bookings remain visible and cannot be overwritten with a time-off block. The instructor's changes immediately affect the learner's available demo slots **within the same browser**. Each confirmed demo booking creates a requested lesson; a multi-lesson block has a shared `blockBookingId` and individual diary entries.
+
+### Test the end-to-end flow
+1. Open the GitHub Pages DriveNow demo. Choose **Instructor** on the demo switcher, open **Availability diary**, select a sample instructor, and add time off or a recurring opening.
+2. Switch to **Learner**, choose **Book ahead**, select that instructor/date and see how the open starts change.
+3. Choose **Block booking**, select 5 or 10 sessions and try the recurring weekly option. Change the start date if no complete series appears. Alternatively, choose **Pick dates individually** and select each slot on separate dates.
+4. Review the block summary, send a *demo* request, then return to the instructor dashboard to accept it and see the entries in the diary.
+5. Re-run an overlapping search. Already requested/confirmed/completed lesson times and a 15-minute turnaround buffer are excluded, unless declined or cancelled.
+6. Use **Reset demo** to restore sample working hours, clear blocked dates and clear demo lessons. This also clears saved demo lesson ratings.
+
+### Important production limitations
+- **No real shared availability, booking guarantees, payments or instructors.** Browser `localStorage` is device-local. Changes made on an instructor's phone do *not* update another person's phone.
+- Real inventory requires authenticated, verified instructor ownership, database tables for windows/time-off/lesson holds, timezone-safe scheduling (Europe/London), transactional no-double-booking constraints, and server-side multi-slot reservation. A React client cannot guarantee no double-booking across users.
+- Block booking changes, payments, rescheduling, cancellation/refund rules and travel-time buffers need full backend and marketplace policy work before launch.
+- `npm run test:schedule` runs automated tests of UK clock calculations, weekly availability, blocked periods, booked-slot exclusion, 15-minute turnaround, and full-series validation. GitHub Actions executes these tests before each build.
+
+---
+
 ## Learner + instructor accounts (November 2026)
 
 The **Account** screen now starts with a choice between **Learner** and **Instructor**. Both lead to different UK eligibility steps and one email/password sign-in backed by Supabase Auth when configured. Instructor registration offers ADI / trainee / Northern Ireland authorisation declarations, teaching-car transmission selection, and an age-21 check. These are **declarations only**: no external DVLA, DVSA or DVA approval is claimed.

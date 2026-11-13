@@ -1,4 +1,4 @@
-const CACHE = 'drivenow-demo-v1';
+const CACHE = 'drivenow-demo-v2-scheduling';
 const SHELL = ['./', './index.html', './icon.svg', './manifest.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
