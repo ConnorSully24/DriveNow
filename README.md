@@ -1,3 +1,21 @@
+## Learner + instructor accounts (November 2026)
+
+The **Account** screen now starts with a choice between **Learner** and **Instructor**. Both lead to different UK eligibility steps and one email/password sign-in backed by Supabase Auth when configured. Instructor registration offers ADI / trainee / Northern Ireland authorisation declarations, teaching-car transmission selection, and an age-21 check. These are **declarations only**: no external DVLA, DVSA or DVA approval is claimed.
+
+For usability testing, either account can be explored instantly with **Skip sign-up / Try demo**. It does not create a database account, store personal data, bypass real verification or enable paid bookings. Demo mode appears when Supabase is unconfigured, or explicitly when `VITE_ENABLE_DEMO_MODE=true`. The GitHub Pages workflow currently enables this staging-only flag. **Remove it for production public onboarding**.
+
+### Enabling real account creation
+
+1. Create a Supabase project, enable Email authentication and **Confirm email** (use test addresses initially). Configure the hosted Site URL and redirect URLs.
+2. Review and run `supabase-schema.sql` in the SQL Editor. This sets up **learner and instructor** profile and verification tables; signup triggers create role-specific profiles and cannot mark people verified.
+3. Add the public `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the **build-time** environment on your hosting provider. For GitHub Pages, pass them as GitHub Actions repository variables, not a private database password. Never expose a service-role or secret key in frontend code.
+4. For test staging, keep `VITE_ENABLE_DEMO_MODE=true`. For public onboarding, remove or set false and establish a privacy notice, verified-email settings, anti-abuse controls, account deletion, UK data-protection handling, and a secure review system.
+5. Test both role signups, email confirmation, sign-in, sign-out, denied cross-user reads (RLS), and that **verification cannot be changed by the user**.
+
+**Not yet live:** No Supabase project credentials are configured in this repo, no trusted verification integration exists, no identity documents are uploaded, and the existing booking/instructor dashboards remain demo data only. Instructors must be independently validated before being permitted to take paid lessons.
+
+---
+
 ## Learner onboarding (November 2026)
 
 The **Learner account** screens now include a three-step UK learner sign-up flow: legal name / DOB / postcode, provisional-licence and eyesight declarations, and email/password account creation. Age 17+ is enforced for the initial pilot, with an explicit note that age-16 mobility exceptions need a separate manual review pathway. A sign-in view and read-only licence-verification status are also provided.

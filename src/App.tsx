@@ -193,7 +193,8 @@ function App() {
   const navItems: Array<{ key: Page; label: string; icon: LucideIcon; role: Role }> = [
     { key: 'home', label: 'Discover', icon: Home, role: 'learner' },
     { key: 'my-lessons', label: 'My lessons', icon: CalendarDays, role: 'learner' },
-    { key: 'signup', label: 'Learner account', icon: UserRound, role: 'learner' },
+    { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'learner' },
+    { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'instructor' },
     { key: 'instructor', label: 'Dashboard', icon: Gauge, role: 'instructor' }
   ];
 
@@ -216,10 +217,10 @@ function App() {
         <button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setMenuOpen(true)}><Menu size={23}/></button>
         <div className="topbar-mobile-brand"><Brand/></div>
         <div className="topbar-breadcrumb">UK launch concept <ChevronRight size={14}/> {role === 'learner' ? 'Learner experience' : 'Instructor experience'}</div>
-        <div className="topbar-right">{role === 'learner' && <button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
+        <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
-        {role === 'learner' && page === 'signup' && <LearnerAccount onBack={() => setPage('home')} />}
+        {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={switchRole} />}
         {role === 'learner' && page === 'home' && <>
           <section className="hero">
             <div className="hero-copy"><span className="hero-kicker"><Zap size={15} fill="currentColor"/> YOUR NEXT LESSON, SORTED</span>
@@ -318,7 +319,7 @@ function App() {
       </main>
       <footer className="footer"><span>© {new Date().getFullYear()} DriveNow concept</span><span>Prototype only · No real bookings or charges</span></footer>
     </div>
-    <nav className="mobile-bottom" aria-label="Mobile navigation"><button className={role==='learner' && page==='home' ? 'active' : ''} onClick={() => {switchRole('learner');setPage('home');}}><Home size={21}/><span>Discover</span></button><button className={role==='learner' && page==='my-lessons' ? 'active' : ''} onClick={() => {setRole('learner');setPage('my-lessons');}}><CalendarDays size={21}/><span>Lessons</span></button><button className={role==='learner' && page==='signup' ? 'active' : ''} onClick={() => { setRole('learner'); setPage('signup'); }}><UserRound size={21}/><span>Account</span></button><button className={role==='instructor' ? 'active' : ''} onClick={() => switchRole('instructor')}><SteeringWheel size={21}/><span>Instructor</span></button></nav>
+    <nav className="mobile-bottom" aria-label="Mobile navigation"><button className={role==='learner' && page==='home' ? 'active' : ''} onClick={() => {switchRole('learner');setPage('home');}}><Home size={21}/><span>Discover</span></button><button className={role==='learner' && page==='my-lessons' ? 'active' : ''} onClick={() => {setRole('learner');setPage('my-lessons');}}><CalendarDays size={21}/><span>Lessons</span></button><button className={page==='signup' ? 'active' : ''} onClick={() => setPage('signup')}><UserRound size={21}/><span>Account</span></button><button className={role==='instructor' && page==='instructor' ? 'active' : ''} onClick={() => switchRole('instructor')}><SteeringWheel size={21}/><span>Instructor</span></button></nav>
     {menuOpen && <button className="sidebar-overlay" aria-label="Close sidebar" onClick={() => setMenuOpen(false)} />}
     {toast && <div className="toast" role="status"><CheckCircle2 size={18}/>{toast}<button aria-label="Dismiss notice" onClick={() => setToast('')}><X size={15}/></button></div>}
   </div>;
