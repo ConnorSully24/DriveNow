@@ -9,7 +9,7 @@ import {
 import LearnerAccount from './LearnerAccount';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
-  prettyDate, prettyStatus, type DemoState, type Instructor, type Lesson,
+  prettyDate, prettyStatus, getDisplaySkill, type DemoState, type Instructor, type Lesson,
   type LessonStatus, type Page, type SearchPreferences, type Timing, type Transmission
 } from './model';
 
@@ -117,6 +117,8 @@ function App() {
   const [toast, setToast] = useState('');
   const [clock, setClock] = useState(Date.now());
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reviewDrafts, setReviewDrafts] = useState<Record<string, number>>({});
+  const [skillDrafts, setSkillDrafts] = useState<Record<string, number>>({});
 
   useEffect(() => { try { localStorage.setItem(STATE_KEY, JSON.stringify(demo)); } catch { /* demo remains usable when storage is blocked */ } }, [demo]);
   useEffect(() => {
@@ -140,6 +142,8 @@ function App() {
   const activeLessons = instructorLessons.filter(l => ['confirmed', 'arrived', 'in_progress'].includes(l.status));
   const earnings = instructorLessons.filter(l => l.status === 'completed').reduce((sum, l) => sum + l.price, 0);
   const lessonCount = demo.lessons.filter(l => !['cancelled', 'declined'].includes(l.status)).length;
+  const skillSummary = getDisplaySkill(demo);
+  const pendingLearnerReviews = demo.lessons.filter(l=>l.status==='completed' && !l.learnerInstructorRating);
   const returnHome = () => { setPage(role === 'learner' ? 'home' : 'instructor'); setOpenLessonId(null); };
 
   function switchRole(newRole: Role) {
@@ -159,9 +163,22 @@ function App() {
     const messages: Partial<Record<LessonStatus, string>> = {
       confirmed: 'Request accepted. Switch to Learner to see the update.',
       arrived: 'Learner marked as picked up in the demo.', in_progress: 'Demo lesson timer started.',
-      completed: 'Lesson completed. Demo earnings updated.', declined: 'Request declined.', cancelled: 'Demo booking cancelled.'
+      completed: 'Lesson completed. Instructor: assess learner skill; learner: review your instructor.', declined: 'Request declined.', cancelled: 'Demo booking cancelled.'
     };
     setToast(messages[status] || 'Booking updated.');
+  }
+
+  function submitLearnerReview(id: string) {
+    const rating = reviewDrafts[id];
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) { setToast('Select a rating from 1 to 5 stars.'); return; }
+    setDemo(prev=>({...prev,lessons:prev.lessons.map(l=>l.id===id && l.status==='completed' && !l.learnerInstructorRating ? {...l,learnerInstructorRating:rating} : l)}));
+    setToast('Instructor rating saved in this demo.');
+  }
+  function submitInstructorSkill(id: string) {
+    const rating = skillDrafts[id];
+    if (!Number.isInteger(rating) || rating < 1 || rating > 10) { setToast('Choose a skill level from 1 to 10.'); return; }
+    setDemo(prev=>({...prev,lessons:prev.lessons.map(l=>l.id===id && l.status==='completed' && !l.instructorLearnerSkill ? {...l,instructorLearnerSkill:rating} : l)}));
+    setToast('Skill assessment saved; the learner now sees the instructor average.');
   }
 
   function createBooking() {
@@ -220,7 +237,7 @@ function App() {
         <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
-        {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={switchRole} />}
+        {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={(demoRole, initialLearnerSkill) => { if (demoRole === 'learner' && initialLearnerSkill != null) setDemo(prev => ({...prev, learnerSelfSkill: initialLearnerSkill})); switchRole(demoRole); }} />}
         {role === 'learner' && page === 'home' && <>
           <section className="hero">
             <div className="hero-copy"><span className="hero-kicker"><Zap size={15} fill="currentColor"/> YOUR NEXT LESSON, SORTED</span>
@@ -243,7 +260,9 @@ function App() {
               <div className="how-step"><div>03</div><span><strong>Get on the road</strong><small>Send a request and track its progress.</small></span></div>
             </section>
           </div>
-          <div className="account-cta"><div><strong>New to driving? Create your learner account</strong><p>Prepare for ID and provisional licence checks before real bookings go live.</p></div><Button variant="secondary" icon={ArrowRight} onClick={() => setPage('signup')}>Get started</Button></div>
+          <div className="skill-summary-card"><div><span className="eyebrow">YOUR CURRENT DRIVING SKILL · DEMO</span><h3>{skillSummary.score.toFixed(1)} / 10</h3><p>{skillSummary.source === 'self' ? 'Your one-time self-estimate from signup. Instructor assessments replace this after your first lesson.' : 'Instructor average from '+skillSummary.count+' assessment'+(skillSummary.count===1?'':'s')+'. Your signup estimate is excluded.'}</p></div><ShieldCheck size={27}/></div>
+           {pendingLearnerReviews.length > 0 && <button className="feedback-alert" onClick={()=>openLessonPage(pendingLearnerReviews[0].id)}><Star size={19}/> You have {pendingLearnerReviews.length} completed {pendingLearnerReviews.length===1?'lesson':'lessons'} to review. Rate your instructor <ArrowRight size={17}/></button>}
+           <div className="account-cta"><div><strong>New to driving? Create your learner account</strong><p>Prepare for ID and provisional licence checks before real bookings go live.</p></div><Button variant="secondary" icon={ArrowRight} onClick={() => setPage('signup')}>Get started</Button></div>
           {lessonCount > 0 && <section className="existing-bookings"><div className="heading-row"><h2>Your recent lessons</h2><button className="text-action" onClick={() => setPage('my-lessons')}>View all <ArrowRight size={16}/></button></div><div className="lesson-list">{demo.lessons.slice(0,2).map(l => <LessonTile key={l.id} lesson={l} onOpen={() => openLessonPage(l.id)}/>)}</div></section>}
         </>}
 
@@ -285,7 +304,7 @@ function App() {
         </>}
 
         {role === 'learner' && page === 'my-lessons' && <><SectionIntro eyebrow="YOUR ACTIVITY" title="My lessons." copy="All your demo requests, from the newest to the oldest."/>
-          <section className="card list-card">{demo.lessons.length ? <div className="lesson-list">{demo.lessons.map(l => <LessonTile key={l.id} lesson={l} onOpen={() => openLessonPage(l.id)}/>)}</div> : <div className="empty-state"><CalendarDays size={37}/><h2>No lessons just yet</h2><p>Your bookings will appear here once you've submitted a demo request.</p><Button onClick={() => setPage('details')} icon={ArrowRight}>Find your first lesson</Button></div>}</section></>}
+          <div className="skill-summary-card"><div><span className="eyebrow">YOUR DRIVING SKILL · DEMO</span><h3>{skillSummary.score.toFixed(1)} / 10</h3><p>{skillSummary.source === 'self' ? 'Sign-up self-estimate, pending an instructor assessment.' : 'Average of '+skillSummary.count+' completed-lesson instructor assessment'+(skillSummary.count===1?'':'s')+'.'}</p></div><ShieldCheck size={25}/></div><section className="card list-card">{demo.lessons.length ? <div className="lesson-list">{demo.lessons.map(l => <LessonTile key={l.id} lesson={l} onOpen={() => openLessonPage(l.id)}/>)}</div> : <div className="empty-state"><CalendarDays size={37}/><h2>No lessons just yet</h2><p>Your bookings will appear here once you've submitted a demo request.</p><Button onClick={() => setPage('details')} icon={ArrowRight}>Find your first lesson</Button></div>}</section></>}
 
         {role === 'learner' && page === 'lesson' && <>
           <SectionIntro eyebrow="LESSON TRACKING" title={openLesson?.status === 'completed' ? 'Nice work behind the wheel!' : 'Your lesson.'} copy="Track your request below. Changes are saved in this browser and can be tested in Instructor view." back={() => setPage('my-lessons')}/>
@@ -296,7 +315,8 @@ function App() {
               {openLesson.status === 'in_progress' && openLesson.startedAt && <div className="lesson-time">{Math.max(0,Math.ceil((openLesson.duration*60000-(clock-new Date(openLesson.startedAt).getTime()))/60000))} <small>minutes remaining (demo)</small></div>}
             </div>
             <div className="detail-rows"><div><IconLabel icon={UserRound}>Instructor</IconLabel><strong>{(INSTRUCTORS.find(i => i.id === openLesson.instructorId) ?? INSTRUCTORS[0]).name}</strong></div><div><IconLabel icon={MapPin}>Pick-up</IconLabel><strong>{openLesson.location}</strong></div><div><IconLabel icon={CalendarDays}>Start</IconLabel><strong>{openLesson.timing === 'ASAP' ? 'As soon as possible' : openLesson.timing === 'Later today' ? `Today ${openLesson.time}` : `${prettyDate(openLesson.date)} ${openLesson.time}`}</strong></div><div><IconLabel icon={Timer}>Lesson length</IconLabel><strong>{openLesson.duration} min</strong></div><div><IconLabel icon={Wallet}>Demo price</IconLabel><strong>{formatGBP(openLesson.price)}</strong></div></div>
-            <div className="tracking-actions">{['requested','confirmed'].includes(openLesson.status) && <Button variant="secondary" onClick={() => updateLesson(openLesson.id,'cancelled')}>Cancel demo request</Button>}{['declined','cancelled','completed'].includes(openLesson.status) && <Button onClick={() => setPage('details')} icon={ArrowRight}>Find another lesson</Button>}</div>
+            {openLesson.status === 'completed' && <div className="feedback-panel"><h3><Star size={19}/> Rate your instructor</h3><p>How was your lesson with {(INSTRUCTORS.find(i=>i.id===openLesson.instructorId)??INSTRUCTORS[0]).name}? Your skill level is assessed separately by your instructor. You won't be asked to rate yourself again.</p>{openLesson.learnerInstructorRating ? <div className="feedback-saved"><CheckCircle2 size={19}/> Your {openLesson.learnerInstructorRating}/5 review has been saved.</div> : <><div className="review-stars" role="group" aria-label="Rate your instructor out of five">{[1,2,3,4,5].map(star=><button type="button" key={star} aria-label={star+' star'+(star===1?'':'s')} aria-pressed={reviewDrafts[openLesson.id]===star} onClick={()=>setReviewDrafts(prev=>({...prev,[openLesson.id]:star}))}><Star size={28} fill={star <= (reviewDrafts[openLesson.id] || 0)?'#f6b42c':'none'} stroke="#d99c1f"/></button>)}</div><Button onClick={()=>submitLearnerReview(openLesson.id)} disabled={!reviewDrafts[openLesson.id]}>Submit instructor rating</Button></>}</div>}
+             <div className="tracking-actions">{['requested','confirmed'].includes(openLesson.status) && <Button variant="secondary" onClick={() => updateLesson(openLesson.id,'cancelled')}>Cancel demo request</Button>}{['declined','cancelled','completed'].includes(openLesson.status) && <Button onClick={() => setPage('details')} icon={ArrowRight}>Find another lesson</Button>}</div>
           </section><aside className="aside-stack"><DemoMap variant="large"/><div className="info-card"><Bell size={19}/><div><strong>Testing the full flow?</strong><p>Use the Instructor demo, select this instructor, and accept the pending request. Then switch back to Learner.</p></div></div></aside></div> : <div className="empty-state"><p>That booking wasn't found in this browser.</p><Button onClick={() => setPage('my-lessons')}>View my lessons</Button></div>}
         </>}
 
@@ -314,7 +334,8 @@ function App() {
             {l.status === 'in_progress' && <><div className="inline-timer"><Timer size={18}/>{l.startedAt ? `${Math.max(0,Math.ceil((l.duration*60000-(clock-new Date(l.startedAt).getTime()))/60000))} min left` : 'Timer running'}</div><Button className="full" icon={CheckCircle2} onClick={() => updateLesson(l.id,'completed')}>Complete lesson</Button></>}
           </div>) : <div className="empty-state mini-empty"><SteeringWheel size={35}/><h3>No active lessons</h3><p>Accepted requests will move here.</p></div>}
           <div className="instructor-tip"><ShieldCheck size={20}/><p><strong>Prototype notice</strong><br/>Real instructor accounts, identity checks, insurance, calendars and payment payouts are not connected.</p></div></section></div>
-          <section className="card history-card"><div className="heading-row"><h2>Lesson history</h2><small>{instructorLessons.length} total demo requests</small></div>{instructorLessons.length ? <div className="history-table">{instructorLessons.map(l => <div key={l.id} className="history-row"><span>{l.customer}<small>{l.location}</small></span><StatusBadge status={l.status}/><strong>{formatGBP(l.price)}</strong></div>)}</div> : <p className="history-empty">Complete a demo lesson to start building your history.</p>}</section>
+          <section className="card feedback-list"><div className="heading-row"><div><span className="eyebrow">AFTER EACH COMPLETED LESSON</span><h2>Assess your learner’s skill</h2></div></div><p className="feedback-explainer">Rate the learner's driving skill from 1 (beginner) to 10 (very confident). Once an assessment exists, the learner sees the average of instructor scores, not their own sign-up estimate.</p>{instructorLessons.some(l=>l.status==='completed') ? instructorLessons.filter(l=>l.status==='completed').map(l=><div className="instructor-feedback-item" key={l.id}><strong>{l.customer} · {l.location}</strong>{l.instructorLearnerSkill ? <div className="feedback-saved"><CheckCircle2 size={17}/> Skill assessment saved: {l.instructorLearnerSkill}/10</div> : <><p>What is this learner's skill level after the lesson?</p><div className="skill-number-grid">{Array.from({length:10},(_,i)=>i+1).map(score=><button type="button" key={score} aria-pressed={skillDrafts[l.id]===score} className={skillDrafts[l.id]===score?'selected':''} onClick={()=>setSkillDrafts(prev=>({...prev,[l.id]:score}))}>{score}</button>)}</div><Button onClick={()=>submitInstructorSkill(l.id)} disabled={!skillDrafts[l.id]}>Submit learner assessment</Button></>}</div>) : <p className="history-empty">Completed demo lessons will appear here for assessment.</p>}</section>
+           <section className="card history-card"><div className="heading-row"><h2>Lesson history</h2><small>{instructorLessons.length} total demo requests</small></div>{instructorLessons.length ? <div className="history-table">{instructorLessons.map(l => <div key={l.id} className="history-row"><span>{l.customer}<small>{l.location}</small></span><StatusBadge status={l.status}/><strong>{formatGBP(l.price)}</strong></div>)}</div> : <p className="history-empty">Complete a demo lesson to start building your history.</p>}</section>
         </>}
       </main>
       <footer className="footer"><span>© {new Date().getFullYear()} DriveNow concept</span><span>Prototype only · No real bookings or charges</span></footer>
