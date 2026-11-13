@@ -1,3 +1,19 @@
+## Milestone: authenticated, conflict-safe SINGLE TEST lesson requests (November 2026)
+
+**Implemented in the Supabase TEST environment only.** Live learner availability now offers a **Request test lesson** action for the Book now and Book ahead previews. This invokes the backend `request_single_test_lesson` RPC, which authorises a genuine learner profile, validates published instructor transmission, upcoming date and at least 30 minutes' notice, checks the union of recurring and ad-hoc working time and all blocked periods, and writes a pending lesson record. No payment or charge is possible. The regular fictional demo bookings remain separate.
+
+A PostgreSQL GiST exclusion constraint on the instructor and a stored time range blocks all overlapping pending/confirmed bookings, including **15-minute turnaround buffers**. A per-instructor advisory transaction lock serialises reservation attempts and the database constraint remains the final arbiter under concurrent requests. A unique learner/client request key supports idempotent retries. Signed-in learners can see only their own test bookings and instructors only bookings assigned to them, using participant-only row-level security. Neither role can write directly to the booking table: only tightly restricted `request_single_test_lesson`, `respond_single_test_lesson`, and `cancel_single_test_lesson` server RPCs can change it. No editable account metadata authorises a booking.
+
+**Instructor test flow:** Create a separate instructor account, confirm the email, open **My live diary · test**, publish test hours and review **Test lesson requests & diary**. Accept or decline a pending request. On acceptance, both sides show *Confirmed · test*; on decline, that time returns to inventory. Either participant may cancel an active test request, releasing its time. Instructors cannot add a new time-off block across an active test booking.
+
+**Learner test flow:** Sign in as a learner, open **Live slots · test**, choose Book now or Book ahead, select an instructor/time, then **Request test lesson**. The time immediately disappears from shared available-slot results; the booking stays in **My live test lessons**. Both calendars poll around every 30 seconds and support Refresh. Search uses the restricted `get_test_busy_slots` RPC to exclude occupied times **without exposing other learners' identities**. Block booking remains a read-only preview with no partial reservation.
+
+**Still not implemented:** external verification, real lesson fulfilment, pricing, pickup areas, instant confirmation rules, session completion/reviews, automatic waitlist alerts on cancellation of real bookings, payment, receipts, refunds, and a production rollout. This is not a real lesson booking service.
+
+Schema files: `supabase-single-test-bookings.sql` and `supabase-sanitised-test-busy-slots.sql`.
+
+---
+
 ## Automatic cancellation alerts — in-app TEST MVP (13 November 2026)
 
 **Opt-in learner alerts are live in Supabase, not phone push.** A learner signs in to their real DriveNow test account and opens **Cancellation alerts** from the app menu/top-bar bell or **Manage alerts** on the live learner availability page. They choose Manual/Automatic, 60/90/120-minute lesson length, and either all currently published instructors or one instructor. **Turn on cancellation alerts** creates a private per-learner watch preference; **Turn alerts off** deletes that preference. Existing inbox entries remain readable.

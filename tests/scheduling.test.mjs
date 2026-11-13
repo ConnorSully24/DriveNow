@@ -124,3 +124,19 @@ test('adjacent recurring and one-off windows allow 90-minute lessons spanning bo
   assert.ok(times.includes('12:00'));
   assert.equal(times.filter(x=>x==='12:00').length,1);
 });
+
+test('database-backed busy slots filter across the single-lesson discovery experience',()=>{
+  const s=state();
+  s.testBusySlots=[{instructorId:'sample',date,time:'10:00',duration:60}];
+  assert.equal(isSlotOpen('sample',slot('10:00'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('09:00'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('11:00'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('11:30'),s,NOW),true);
+  assert.ok(!slotsForDate('sample',date,60,s,NOW).some(x=>x.time==='10:30'));
+});
+test('database busy slots apply to recurring block previews without claiming to reserve them',()=>{
+  const s=state();
+  s.testBusySlots=[{instructorId:'sample',date:isoDay(date,14),time:'10:00',duration:60}];
+  assert.equal(seriesAvailable('sample',recurringSeries(slot('10:00'),5),s,NOW),false);
+  assert.equal(seriesAvailable('sample',recurringSeries(slot('13:00'),5),s,NOW),true);
+});

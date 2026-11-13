@@ -38,7 +38,7 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 
 ### Block booking requirements (part of the booking engine, not just a discount package)
 - [x] DEMO: **Block booking** option beside Book now and Book ahead; same time weekly or individually selected dates.
-- [ ] PRODUCTION: Authenticate and persist book-now, book-ahead and block bookings across users.
+- [ ] PRODUCTION: Authenticate and persist book-now, book-ahead and block bookings across users (single-lesson TEST RPC now exists; block booking still preview-only).
 - [ ] Learner selects number of lessons (suggest starting with 5 or 10), lesson duration, transmission, postcode/area, preferred instructor, first date and preferred days/times.
 - [ ] Offer **same day/time every week** (e.g. five Tuesdays at 6pm) and **choose dates individually**.
 - [x] DEMO: Filter recurring start times to those with a complete 5/10-lesson series (same browser only).
@@ -71,7 +71,10 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 - [x] Add top-bar unread bell, per-user read controls and cross-device inbox polling.
 - [ ] Connect cancellations to actual confirmed lessons, add email/phone push delivery with permission and secure worker, and fill slots with transactional reservations.
 - [ ] Verify instructor sign-up and cross-device behaviour with two independently created test accounts.
-- [ ] Implement server-side holds and shared booking data before enabling even test reservations.
+- [x] Implement authenticated single-test-lesson requests via restricted backend RPC, participant-only calendars and instructor accept/decline/cancel actions.
+- [x] Prevent overlapping pending/confirmed single test lessons atomically using a PostgreSQL exclusion constraint and 15-minute turnaround buffers; expose sanitised busy-slot data without learner PII.
+- [ ] Validate account-to-account acceptance, decline, cancellation and simultaneous bookings with independent test identities.
+- [ ] Build all-or-nothing multi-lesson block holds and a unified live learner booking journey; do not allow paid lessons until external checks.
 - [ ] Independently verify credentials before listing any instructor as approved or offering paid lessons.
 
 ## Phase 2 — Payments, communication, and cancellations (P0 for launch)

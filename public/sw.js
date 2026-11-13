@@ -1,4 +1,4 @@
-const CACHE = 'drivenow-demo-v5-cancellation-alerts';
+const CACHE = 'drivenow-demo-v6-test-lesson-bookings';
 const SHELL = ['./', './index.html', './icon.svg', './manifest.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));

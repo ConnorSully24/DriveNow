@@ -244,3 +244,34 @@
 .alert-item-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 .alert-view{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 13px;color:#fff;background:#7544cd;border-radius:10px;font-size:.76rem;font-weight:800}
 @media(max-width:700px){.live-alerts-promo,.alert-section-heading{flex-direction:column;align-items:stretch}.live-alerts-promo button{align-self:flex-start}.alert-item{align-items:stretch;flex-direction:column}.alert-item-actions{justify-content:flex-start}.alert-toplink{font-size:.72rem}}
+
+/* Shared TEST booking calendar and request flow, deliberately separate from demo. */
+.test-bookings-panel{display:grid;gap:12px}
+.test-bookings-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.test-bookings-heading h2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 8px}
+.test-bookings-heading p{margin:0}
+.test-bookings-caveat{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;border:1px solid #f3dfbd;background:#fffaf0;color:#845e32;font-size:.73rem}
+.test-bookings-panel h3{font-size:.81rem;color:#695876;margin:8px 0 0}
+.test-booking-list{display:grid;gap:10px}
+.test-booking-row{display:flex;align-items:center;justify-content:space-between;gap:17px;padding:14px;border-radius:12px;background:#fdfcff;border:1px solid #e9e1f1}
+.test-booking-requested{border-color:#e5ce8e;background:#fffdf7}
+.test-booking-summary{display:flex;flex-direction:column;gap:5px;min-width:0}
+.test-booking-summary>strong{font-size:.91rem;color:#443654}
+.test-booking-summary>span:not(.test-booking-status){display:flex;align-items:center;gap:5px;font-size:.73rem;color:#736583}
+.test-booking-summary>small{font-size:.71rem;color:#93839c}
+.test-booking-status{display:inline-flex;align-self:flex-start;align-items:center;padding:5px 9px;border-radius:999px;background:#e7e5ec;color:#675d73;font-size:.67rem;font-weight:800}
+.test-booking-status.status-requested{background:#fdf1cc;color:#93631d}
+.test-booking-status.status-confirmed{background:#e2f3e5;color:#247d48}
+.test-booking-status.status-declined,.test-booking-status.status-cancelled{background:#f0e9ed;color:#8d687a}
+.test-booking-count{padding:5px 8px;border-radius:999px;background:#fff0c5;color:#8a5d10;font-size:.66rem}
+.test-booking-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;max-width:420px}
+.test-booking-accept,.test-booking-decline,.test-booking-cancel{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;padding:10px 13px;font-size:.74rem;font-weight:800}
+.test-booking-accept{background:#7442d2;color:white}
+.test-booking-decline,.test-booking-cancel{border:1px solid #d9cce7;background:#fff;color:#765d85}
+.test-booking-cancel{color:#985b6c}
+.test-booking-accept:disabled,.test-booking-decline:disabled,.test-booking-cancel:disabled{opacity:.5}
+.test-bookings-empty{display:grid;justify-items:center;gap:9px;padding:25px;color:#8a7d99;text-align:center}
+.test-bookings-empty p{font-size:.8rem;margin:0}
+.live-test-request{margin-top:5px;width:100%;align-self:stretch}
+.live-available-option{gap:9px}
+@media(max-width:700px){.test-booking-row,.test-bookings-heading{flex-direction:column;align-items:stretch}.test-booking-actions{justify-content:flex-start;max-width:none}.test-bookings-caveat{align-items:flex-start}}
