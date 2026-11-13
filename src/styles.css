@@ -275,3 +275,21 @@
 .live-test-request{margin-top:5px;width:100%;align-self:stretch}
 .live-available-option{gap:9px}
 @media(max-width:700px){.test-booking-row,.test-bookings-heading{flex-direction:column;align-items:stretch}.test-booking-actions{justify-content:flex-start;max-width:none}.test-bookings-caveat{align-items:flex-start}}
+
+/* Seven-day calendars for real shared TEST lesson records */
+.test-week-overview{margin:5px 0 9px;min-width:0}
+.test-week-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.test-week-header h3{margin:0!important;color:#463651!important}
+.test-week-header small{font-size:.7rem;color:#93869d}
+.test-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.test-week-day{display:flex;align-items:stretch;flex-direction:column;gap:7px;min-width:0;min-height:100px;padding:10px 7px;border:1px solid #e9e1f1;border-radius:10px;background:#faf9fc}
+.test-week-busy{background:#fdfcff;border-color:#d8c6ee}
+.test-week-label{color:#7a6985;font-size:.68rem;text-align:center;white-space:nowrap}
+.test-week-label strong{font-size:.68rem;font-weight:800}
+.test-week-clear{text-align:center;margin-top:auto;margin-bottom:auto;color:#c2b6cc}
+.test-week-event{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;background:#fff2cb;border-radius:8px;color:#7a5719;line-height:1.25}
+.test-week-event.is-confirmed{background:#e6f4e9;color:#286c3e}
+.test-week-event strong{font-size:.78rem}
+.test-week-event span{font-size:.65rem}
+.test-week-event small{font-size:.59rem;text-align:center;font-weight:800}
+@media(max-width:750px){.test-week-grid{grid-template-columns:repeat(7,minmax(83px,1fr));overflow-x:auto;padding-bottom:8px}.test-week-day{min-height:105px}.test-week-overview{overflow-x:auto}}
