@@ -73,7 +73,10 @@ export function isSlotOpen(instructorId:string,slot:SlotSelection,state:DemoStat
   const start=timeMinutes(slot.time);
   if(!/^\d{4}-\d{2}-\d{2}$/.test(slot.date)||!Number.isFinite(start)||!validWindow(slot.time,minuteTime(start+slot.duration))) return false;
   const clock=ukClock(now);
-  if(slot.date<clock.date || (slot.date===clock.date && start<clock.minutes+MIN_NOTICE_MINUTES))return false;
+  // Compare London calendar days and local minutes, including a lead time
+  // that crosses midnight. This is scheduling logic, not UTC booking storage.
+  const dayOffset=Math.round((Date.parse(slot.date+'T00:00:00Z')-Date.parse(clock.date+'T00:00:00Z'))/86400000);
+  if(dayOffset*1440+start<clock.minutes+MIN_NOTICE_MINUTES)return false;
   if(!state.weeklyWindows.some(w=>w.instructorId===instructorId && w.weekday===weekday(slot.date) &&
     validWindow(w.start,w.end) && start>=timeMinutes(w.start) && start+slot.duration<=timeMinutes(w.end)))return false;
   if(state.diaryBlocks.some(b=>b.instructorId===instructorId && blocksSlot(b,slot)))return false;

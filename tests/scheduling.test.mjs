@@ -67,3 +67,11 @@ test('custom blocks may not overlap one another', () => {
   assert.equal(seriesAvailable('sample',[slot('10:00'),slot('11:00')],s,NOW),false);
   assert.equal(seriesAvailable('sample',[slot('10:00'),slot('11:30')],s,NOW),true);
 });
+
+test('minimum notice still applies when a booking crosses UK midnight', () => {
+  const s=state();
+  s.weeklyWindows=[{id:'sat',instructorId:'sample',weekday:6,start:'00:00',end:'03:00'}];
+  const late=new Date('2026-11-13T23:50:00Z'); // Friday, 23:50 UK
+  assert.equal(isSlotOpen('sample',slot('00:00','2026-11-14'),s,late),false);
+  assert.equal(isSlotOpen('sample',slot('00:30','2026-11-14'),s,late),true);
+});
