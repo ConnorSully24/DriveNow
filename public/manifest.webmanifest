@@ -1,0 +1,13 @@
+{
+  "name": "DriveNow – on-demand driving lessons (Demo)",
+  "short_name": "DriveNow",
+  "description": "A prototype marketplace for short-notice driving lessons.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6fc",
+  "theme_color": "#18132e",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
