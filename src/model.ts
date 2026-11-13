@@ -1,7 +1,11 @@
 export type Transmission = 'Manual' | 'Automatic';
 export type LessonStatus = 'requested' | 'confirmed' | 'arrived' | 'in_progress' | 'completed' | 'declined' | 'cancelled';
 export type Timing = 'ASAP' | 'Later today' | 'Choose a date';
-export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor' | 'signup';
+export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor' | 'signup' | 'schedule';
+export type BookingMode = 'now' | 'ahead' | 'block';
+export interface SlotSelection { date: string; time: string; duration: number; }
+export interface WeeklyWindow { id: string; instructorId: string; weekday: number; start: string; end: string; }
+export interface DiaryBlock { id: string; instructorId: string; date: string; start: string; end: string; note: string; }
 
 export interface Instructor {
   id: string;
@@ -40,6 +44,7 @@ export interface Lesson {
   price: number;
   status: LessonStatus;
   startedAt?: string;
+  blockBookingId?: string;
   completedAt?: string;
   /** Learner rates instructor out of five after completion. */
   learnerInstructorRating?: number;
@@ -50,6 +55,8 @@ export interface Lesson {
 export interface DemoState {
   lessons: Lesson[];
   instructorOnline: boolean;
+  weeklyWindows: WeeklyWindow[];
+  diaryBlocks: DiaryBlock[];
   learnerSelfSkill: number;
 }
 
@@ -68,7 +75,15 @@ export const DEFAULT_PREFS: SearchPreferences = {
   time: '14:00'
 };
 
-export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true, learnerSelfSkill: 5 };
+export const INITIAL_WEEKLY_WINDOWS: WeeklyWindow[] = INSTRUCTORS.flatMap(instructor =>
+  [1, 2, 3, 4, 5].flatMap(day => [
+    { id: `${instructor.id}-${day}-morning`, instructorId: instructor.id, weekday: day, start: '09:00', end: '12:00' },
+    { id: `${instructor.id}-${day}-afternoon`, instructorId: instructor.id, weekday: day, start: '13:00', end: '17:00' }
+  ]).concat([
+    { id: `${instructor.id}-6-weekend`, instructorId: instructor.id, weekday: 6, start: '10:00', end: '14:00' }
+  ])
+);
+export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true, learnerSelfSkill: 5, weeklyWindows: INITIAL_WEEKLY_WINDOWS, diaryBlocks: [] };
 export const STATE_KEY = 'drivenow-demo-v1';
 
 export function loadDemoState(): DemoState {
@@ -79,6 +94,8 @@ export function loadDemoState(): DemoState {
     if (parsed && typeof parsed === 'object' && 'lessons' in parsed && Array.isArray(parsed.lessons)) {
       const input = parsed as DemoState;
       return { lessons: input.lessons, instructorOnline: input.instructorOnline !== false,
+        weeklyWindows: Array.isArray(input.weeklyWindows) ? input.weeklyWindows : INITIAL_WEEKLY_WINDOWS,
+        diaryBlocks: Array.isArray(input.diaryBlocks) ? input.diaryBlocks : [],
         learnerSelfSkill: Number.isInteger(input.learnerSelfSkill) && input.learnerSelfSkill >= 1 && input.learnerSelfSkill <= 10 ? input.learnerSelfSkill : 5 };
     }
   } catch { /* damaged storage falls back to a clean demo */ }
