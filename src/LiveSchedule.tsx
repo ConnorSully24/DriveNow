@@ -115,7 +115,7 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
   const customValid=Boolean(active&&customSlots.length===count&&seriesAvailable(activeId,customSlots,liveState));
 
   function reloadNow(){setNotice('');setReload(x=>x+1);}
-  async function apply(action:()=>Promise<{error:{message:string}|null}>,success:string){
+  async function apply(action:()=>PromiseLike<{error:{message:string}|null}>,success:string){
     if(busy)return;
     setBusy(true);setError('');setNotice('');
     try {

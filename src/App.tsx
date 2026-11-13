@@ -9,6 +9,7 @@ import {
 import LearnerAccount from './LearnerAccount';
 import BookingSchedule from './BookingSchedule';
 import InstructorDiary from './InstructorDiary';
+import LiveSchedule from './LiveSchedule';
 import { formatDay, seriesAvailable } from './scheduling';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
@@ -243,6 +244,8 @@ function App() {
       <p className="sidebar-copy">Driving lessons, at your fingertips.</p>
       <nav className="side-nav" aria-label="Main menu">
         {navItems.filter(item => item.role === role).map(item => <button key={item.key} className={`side-link ${page === item.key ? 'side-link-active' : ''}`} onClick={() => { setPage(item.key); setMenuOpen(false); }}><item.icon size={19}/>{item.label}</button>)}
+        <button className={`side-link ${page==='live-slots'?'side-link-active':''}`} onClick={()=>{setPage('live-slots');setMenuOpen(false);}}><Search size={19}/> Live slots · test</button>
+        <button className={`side-link ${page==='live-diary'?'side-link-active':''}`} onClick={()=>{setPage('live-diary');setMenuOpen(false);}}><CalendarDays size={19}/> My live diary · test</button>
       </nav>
       <div className="sidebar-spacer"/>
       <div className="sidebar-feature"><span><Zap size={17} fill="currentColor"/></span><strong>Built for the moment</strong><p>Find a lesson or fill an empty diary slot.</p></div>
@@ -258,6 +261,8 @@ function App() {
         <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
+        {page === 'live-slots' && <LiveSchedule view="learner" onOpenAccount={()=>setPage('signup')}/>}
+        {page === 'live-diary' && <LiveSchedule view="instructor" onOpenAccount={()=>setPage('signup')}/>}
         {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={(demoRole, initialLearnerSkill) => { if (demoRole === 'learner' && initialLearnerSkill != null) setDemo(prev => ({...prev, learnerSelfSkill: initialLearnerSkill})); switchRole(demoRole); }} />}
         {role === 'learner' && page === 'home' && <>
           <section className="hero">
@@ -269,7 +274,8 @@ function App() {
             </div>
             <div className="hero-visual"><div className="hero-circle circle-a"/><div className="hero-circle circle-b"/><div className="floating-card floating-card-top"><span className="floating-icon"><Zap size={18}/></span><div><strong>Slot available</strong><span>Today · 2:30 PM</span></div></div><div className="hero-car"><CarFront size={125} strokeWidth={1.3}/></div><div className="floating-card floating-card-bottom"><span className="rating-star"><Star size={17} fill="currentColor"/></span><div><strong>4.9 out of 5</strong><span>Example instructor rating</span></div></div></div>
           </section>
-          <div className="booking-entry-grid" aria-label="Choose how to book">
+          <div className="live-explore-callout"><div><span className="eyebrow">NEW · SUPABASE TEST</span><strong>Explore real instructor-entered availability</strong><p>See schedules synced across phones. No real reservations or payments.</p></div><button type="button" onClick={()=>setPage('live-slots')}>Browse live test slots <ArrowRight size={17}/></button></div>
+           <div className="booking-entry-grid" aria-label="Choose how to book">
              <button type="button" onClick={()=>showSchedule('now')}><Zap size={27}/><strong>Book now</strong><span>Short-notice lesson slots</span><ArrowRight size={18}/></button>
              <button type="button" onClick={()=>showSchedule('ahead')}><CalendarDays size={27}/><strong>Book ahead</strong><span>Pick a day and time</span><ArrowRight size={18}/></button>
              <button type="button" onClick={()=>showSchedule('block')}><CalendarDays size={27}/><strong>Block booking</strong><span>5 or 10 lessons together</span><ArrowRight size={18}/></button>
@@ -353,7 +359,8 @@ function App() {
           <div className="stat-grid"><div className="stat-card stat-availability"><div className="stat-icon"><Zap size={19}/></div><span>AVAILABILITY</span><strong>{demo.instructorOnline ? 'Online' : 'Offline'}</strong><label className="toggle-row">{demo.instructorOnline ? 'Accepting requests' : 'Not accepting requests'}<input aria-label="Available for new bookings" type="checkbox" checked={demo.instructorOnline} onChange={e => setDemo(prev => ({...prev, instructorOnline: e.target.checked}))}/><span className="switch-track"/></label></div>
             <div className="stat-card"><div className="stat-icon icon-violet"><CalendarDays size={20}/></div><span>YOUR REQUESTS</span><strong>{activeRequests.length}</strong><small>Pending response</small></div>
             <div className="stat-card"><div className="stat-icon icon-gold"><Coins size={20}/></div><span>DEMO EARNINGS</span><strong>{formatGBP(earnings)}</strong><small>Completed lesson value</small></div></div>
-          <button type="button" className="open-diary-button" onClick={()=>setPage('diary')}><CalendarDays size={20}/> Manage my availability diary <ArrowRight size={18}/></button>
+          <button type="button" className="open-diary-button" onClick={()=>setPage('live-diary')}><CalendarDays size={20}/> Manage my Supabase availability <ArrowRight size={18}/></button>
+           <button type="button" className="open-diary-button open-diary-secondary" onClick={()=>setPage('diary')}><CalendarDays size={20}/> Manage my availability diary <ArrowRight size={18}/></button>
            <div className="instructor-workgrid"><section className="card requests-card"><div className="heading-row"><div><span className="eyebrow">LIVE IN YOUR DEMO</span><h2>New lesson requests <span className="number-pill">{activeRequests.length}</span></h2></div><span className="round-icon"><Bell size={20}/></span></div>
             {!demo.instructorOnline && <div className="offline-note"><CircleHelp size={17}/> You're offline. Turn availability on to accept new requests.</div>}
             {activeRequests.length ? activeRequests.map(l => <div className="request-card" key={l.id}><div className="request-top"><span><Zap size={15}/> NEW REQUEST</span><strong>{formatGBP(l.price)}</strong></div><h3>Driving lesson in {l.location}</h3><div className="request-details"><IconLabel icon={Clock3}>{l.timing === 'ASAP' ? 'As soon as possible' : l.timing === 'Later today' ? `Today · ${l.time}` : `${prettyDate(l.date)} · ${l.time}`}</IconLabel><IconLabel icon={Timer}>{l.duration} minutes</IconLabel><IconLabel icon={CarFront}>{l.transmission}</IconLabel><IconLabel icon={UserRound}>Sophie M. (demo)</IconLabel></div><div className="request-actions"><Button variant="secondary" onClick={() => updateLesson(l.id,'declined')}>Decline</Button><Button variant="primary" disabled={!demo.instructorOnline} onClick={() => updateLesson(l.id,'confirmed')} icon={Check}>Accept request</Button></div></div>) : <div className="empty-state mini-empty"><Bell size={33}/><h3>All caught up</h3><p>New learner requests for this demo profile will appear here.</p></div>}
