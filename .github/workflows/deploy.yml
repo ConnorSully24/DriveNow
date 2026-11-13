@@ -25,6 +25,8 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Test scheduling engine
+        run: npm run test:schedule
       - name: Build
         env:
           # Staging-only demo bypass. It never creates real accounts or bookings.
