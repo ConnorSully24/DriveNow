@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, CalendarDays, Check, Clock3, RefreshCw, ShieldAlert, UserRound, X } from 'lucide-react';
 import { supabase } from './auth';
-import { formatDay } from './scheduling';
+import { formatDay, isoDay, ukClock } from './scheduling';
 
 export type TestBooking = {
   id:string;learner_id:string;instructor_id:string;
@@ -98,6 +98,8 @@ export default function LiveBookings({view,refreshKey,onChanged,onOpenAccount}:{
   const pending=own.filter(b=>b.status==='requested');
   const active=own.filter(b=>b.status==='requested'||b.status==='confirmed');
   const history=own.filter(b=>b.status==='cancelled'||b.status==='declined');
+  const nextSeven=Array.from({length:7},(_,i)=>isoDay(ukClock().date,i));
+  const visibleWeek=own.filter(b=>(b.status==='requested'||b.status==='confirmed')&&nextSeven.includes(b.lesson_date));
 
   function row(b:TestBooking){
     const future=new Date(b.start_at).getTime()>Date.now();
@@ -118,6 +120,10 @@ export default function LiveBookings({view,refreshKey,onChanged,onOpenAccount}:{
   return <section className="live-card test-bookings-panel">
     <div className="test-bookings-heading"><div><span className="eyebrow">SHARED SUPABASE · NO PAYMENTS</span><h2><CalendarDays size={20}/>{view==='learner'?'My live test lessons':'Test lesson requests & diary'}{view==='instructor'&&pending.length>0&&<span className="test-booking-count">{pending.length} pending</span>}</h2><p>{view==='learner'?'Your requests and confirmations are shared with the instructor.':'Accept or decline requests from learners. Decisions update both calendars.'}</p></div><button type="button" className="live-refresh" disabled={loading||!!saving} onClick={()=>setRefresh(n=>n+1)}><RefreshCw size={16}/>{loading?'Loading…':'Refresh'}</button></div>
     <div className="test-bookings-caveat"><ShieldAlert size={17}/> All entries are TEST reservations only. No driving lesson, payment or instructor verification is provided.</div>
+    {userId&&<div className="test-week-overview"><div className="test-week-header"><h3>Next seven days</h3><small>Pending and confirmed test lessons · Europe/London</small></div><div className="test-week-grid">{nextSeven.map(day=>{
+      const items=visibleWeek.filter(b=>b.lesson_date===day).sort((a,b)=>a.lesson_time.localeCompare(b.lesson_time));
+      return <div className={'test-week-day '+(items.length?'test-week-busy':'')} key={day}><div className="test-week-label"><strong>{formatDay(day)}</strong></div>{items.length?items.map(item=><div key={item.id} className={'test-week-event '+(item.status==='confirmed'?'is-confirmed':'')}><strong>{item.lesson_time.slice(0,5)}</strong><span>{item.duration_minutes} min</span><small>{item.status==='confirmed'?'Confirmed':'Pending'}</small></div>):<span className="test-week-clear">—</span>}</div>;
+    })}</div></div>}
     {error&&<p role="alert" className="booking-error">{error}</p>}
     {notice&&<p role="status" className="diary-feedback"><Check size={16}/>{notice}</p>}
     {sessionChecked&&!userId&&<div className="test-bookings-empty"><UserRound size={24}/><p>Sign in to see shared test bookings.</p><button className="test-booking-accept" onClick={onOpenAccount}>Open sign-in <ArrowRight size={16}/></button></div>}
