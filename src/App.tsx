@@ -7,9 +7,12 @@ import {
   Zap, type LucideIcon
 } from 'lucide-react';
 import LearnerAccount from './LearnerAccount';
+import BookingSchedule from './BookingSchedule';
+import InstructorDiary from './InstructorDiary';
+import { formatDay, seriesAvailable } from './scheduling';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
-  prettyDate, prettyStatus, getDisplaySkill, type DemoState, type Instructor, type Lesson,
+  prettyDate, prettyStatus, getDisplaySkill, type BookingMode, type SlotSelection, type DiaryBlock, type WeeklyWindow, type DemoState, type Instructor, type Lesson,
   type LessonStatus, type Page, type SearchPreferences, type Timing, type Transmission
 } from './model';
 
@@ -111,6 +114,8 @@ function App() {
   const [page, setPage] = useState<Page>('home');
   const [prefs, setPrefs] = useState<SearchPreferences>({ ...DEFAULT_PREFS, date: todayLocal() });
   const [selectedId, setSelectedId] = useState(INSTRUCTORS[0].id);
+  const [bookingMode, setBookingMode] = useState<BookingMode>('ahead');
+  const [selectedSlots, setSelectedSlots] = useState<SlotSelection[]>([]);
   const [instructorAccountId, setInstructorAccountId] = useState('james');
   const [demo, setDemo] = useState<DemoState>(loadDemoState);
   const [openLessonId, setOpenLessonId] = useState<string | null>(null);
@@ -135,7 +140,8 @@ function App() {
   const activeInstructor = INSTRUCTORS.find(i => i.id === instructorAccountId) ?? INSTRUCTORS[0];
   const filteredInstructors = INSTRUCTORS.filter(i => i.transmission.includes(prefs.transmission));
   const durationHours = prefs.duration / 60;
-  const amount = Math.round(selected.price * durationHours);
+  const unitAmount = Math.round(selected.price * durationHours);
+  const amount = unitAmount * Math.max(1,selectedSlots.length);
   const openLesson = openLessonId ? demo.lessons.find(l => l.id === openLessonId) : undefined;
   const instructorLessons = demo.lessons.filter(l => l.instructorId === instructorAccountId);
   const activeRequests = instructorLessons.filter(l => l.status === 'requested');
@@ -181,24 +187,38 @@ function App() {
     setToast('Skill assessment saved; the learner now sees the instructor average.');
   }
 
-  function createBooking() {
-    const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `demo-${Date.now()}`;
-    const newLesson: Lesson = {
-      id, instructorId: selected.id, customer: 'Sophie M.', bookedAt: new Date().toISOString(),
-      location: prefs.location.trim(), transmission: prefs.transmission,
-      duration: prefs.duration, timing: prefs.timing, date: prefs.date, time: prefs.time,
-      price: amount, status: 'requested'
-    };
-    setDemo(prev => ({ ...prev, lessons: [newLesson, ...prev.lessons] }));
-    setOpenLessonId(id);
-    setPage('lesson');
-    setToast('Demo request sent. No money has been taken.');
+  function showSchedule(mode:BookingMode) {
+    setBookingMode(mode);setSelectedSlots([]);setRole('learner');setPage('schedule');
   }
+  function confirmSchedule(slots:SlotSelection[],instructorId:string) {
+    if(!slots.length)return;
+    setSelectedSlots(slots.slice());setSelectedId(instructorId);
+    setPrefs(prev=>({...prev,timing:'Choose a date',date:slots[0].date,time:slots[0].time,duration:slots[0].duration}));
+    setPage('checkout');
+  }
+  function createBooking() {
+    if(!selectedSlots.length || !seriesAvailable(selected.id,selectedSlots,demo)){
+      setToast('A selected time is no longer free. Please choose new slots.');setPage('schedule');return;
+    }
+    // Local single-browser demo only; real booking requires an atomic server hold.
+    const groupId=selectedSlots.length>1?demoId():undefined;
+    const lessons:Lesson[]=selectedSlots.map(slot=>({
+      id:demoId(),instructorId:selected.id,customer:'Sophie M.',bookedAt:new Date().toISOString(),
+      blockBookingId:groupId,location:prefs.location.trim(),transmission:prefs.transmission,
+      duration:slot.duration,timing:'Choose a date',date:slot.date,time:slot.time,price:unitAmount,status:'requested'
+    }));
+    setDemo(prev=>seriesAvailable(selected.id,selectedSlots,prev)?{...prev,lessons:[...lessons,...prev.lessons]}:prev);
+    setOpenLessonId(lessons[0].id);setPage(lessons.length>1?'my-lessons':'lesson');
+    setSelectedSlots([]);
+    setToast(lessons.length>1?lessons.length+' demo lessons requested as a block. No payment taken.':'Demo lesson requested. No payment taken.');
+  }
+  function demoId() { return typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : 'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2); }
 
   function resetDemo() {
     if (!window.confirm('Clear all demo lessons and reset instructor availability?')) return;
     setDemo(INITIAL_STATE);
     setOpenLessonId(null);
+    setSelectedSlots([]);
     setPage(role === 'learner' ? 'home' : 'instructor');
     setToast('Demo data reset.');
   }
@@ -212,7 +232,8 @@ function App() {
     { key: 'my-lessons', label: 'My lessons', icon: CalendarDays, role: 'learner' },
     { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'learner' },
     { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'instructor' },
-    { key: 'instructor', label: 'Dashboard', icon: Gauge, role: 'instructor' }
+    { key: 'instructor', label: 'Dashboard', icon: Gauge, role: 'instructor' },
+    { key: 'diary', label: 'Availability diary', icon: CalendarDays, role: 'instructor' }
   ];
 
   return <div className="app-shell">
