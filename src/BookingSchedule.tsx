@@ -33,7 +33,11 @@ export default function BookingSchedule({initialMode,prefs,onPrefs,instructorId,
   const blockProposals=mode==='block' && pattern==='weekly'?firstDateRecurring:[];
   const chosenValid=instructor && chosen.length>0 && seriesAvailable(chosenId,chosen,state);
   const ready=mode==='block'?chosen.length===blockCount && Boolean(chosenValid):chosen.length===1 && Boolean(chosenValid);
-  useEffect(()=>{setChosen([]);setError('')},[mode,date,blockCount,pattern,prefs.duration,prefs.transmission,instructorId]);
+  useEffect(()=>{setChosen([]);setError('')},[mode,blockCount,pattern,prefs.duration,prefs.transmission,instructorId]);
+  // Custom blocks accumulate dates: switching calendar days must retain them.
+  useEffect(()=>{
+    if(mode!=='block'||pattern==='weekly'){setChosen([]);setError('');}
+  },[date,mode,pattern]);
   function go(){
     if(prefs.location.trim().length<3){setError('Enter a pick-up postcode or area.');return;}
     if(!ready||!instructor){setError('Select available lesson times before continuing.');return;}
