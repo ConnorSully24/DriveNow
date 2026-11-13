@@ -6,6 +6,7 @@ export type BookingMode = 'now' | 'ahead' | 'block';
 export interface SlotSelection { date: string; time: string; duration: number; }
 export interface WeeklyWindow { id: string; instructorId: string; weekday: number; start: string; end: string; }
 export interface DiaryBlock { id: string; instructorId: string; date: string; start: string; end: string; note: string; }
+export interface OneOffWindow { id: string; instructorId: string; date: string; start: string; end: string; source: 'cancellation' | 'extra'; }
 
 export interface Instructor {
   id: string;
@@ -57,6 +58,7 @@ export interface DemoState {
   instructorOnline: boolean;
   weeklyWindows: WeeklyWindow[];
   diaryBlocks: DiaryBlock[];
+  oneOffWindows: OneOffWindow[];
   learnerSelfSkill: number;
 }
 
@@ -83,7 +85,7 @@ export const INITIAL_WEEKLY_WINDOWS: WeeklyWindow[] = INSTRUCTORS.flatMap(instru
     { id: `${instructor.id}-6-weekend`, instructorId: instructor.id, weekday: 6, start: '10:00', end: '14:00' }
   ])
 );
-export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true, learnerSelfSkill: 5, weeklyWindows: INITIAL_WEEKLY_WINDOWS, diaryBlocks: [] };
+export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true, learnerSelfSkill: 5, weeklyWindows: INITIAL_WEEKLY_WINDOWS, diaryBlocks: [], oneOffWindows: [] };
 export const STATE_KEY = 'drivenow-demo-v1';
 
 export function loadDemoState(): DemoState {
@@ -96,6 +98,7 @@ export function loadDemoState(): DemoState {
       return { lessons: input.lessons, instructorOnline: input.instructorOnline !== false,
         weeklyWindows: Array.isArray(input.weeklyWindows) ? input.weeklyWindows : INITIAL_WEEKLY_WINDOWS,
         diaryBlocks: Array.isArray(input.diaryBlocks) ? input.diaryBlocks : [],
+        oneOffWindows: Array.isArray(input.oneOffWindows) ? input.oneOffWindows : [],
         learnerSelfSkill: Number.isInteger(input.learnerSelfSkill) && input.learnerSelfSkill >= 1 && input.learnerSelfSkill <= 10 ? input.learnerSelfSkill : 5 };
     }
   } catch { /* damaged storage falls back to a clean demo */ }

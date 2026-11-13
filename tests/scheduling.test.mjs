@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isSlotOpen, slotsForDate, recurringSeries, seriesAvailable, availableRecurringSeries, isoDay, ukClock } from '../src/scheduling.ts';
+import { isSlotOpen, slotsForDate, recurringSeries, seriesAvailable, availableRecurringSeries, isoDay, ukClock, suggestedOpening } from '../src/scheduling.ts';
 
 const NOW = new Date('2026-11-13T08:00:00Z'); // Friday, 08:00 UK
 const date = '2026-11-13';
 const state = () => ({
-  lessons: [], learnerSelfSkill: 5, instructorOnline: true, diaryBlocks: [],
+  lessons: [], learnerSelfSkill: 5, instructorOnline: true, diaryBlocks: [], oneOffWindows: [],
   weeklyWindows: [{
     id: 'friday', instructorId: 'sample', weekday: 5, start: '09:00', end: '17:00'
   }]
@@ -74,4 +74,43 @@ test('minimum notice still applies when a booking crosses UK midnight', () => {
   const late=new Date('2026-11-13T23:50:00Z'); // Friday, 23:50 UK
   assert.equal(isSlotOpen('sample',slot('00:00','2026-11-14'),s,late),false);
   assert.equal(isSlotOpen('sample',slot('00:30','2026-11-14'),s,late),true);
+});
+
+test('ad-hoc cancellation opening creates slots outside weekly hours',()=>{
+  const s=state();
+  s.weeklyWindows=[];
+  s.oneOffWindows=[{id:'cancellation',instructorId:'sample',date,start:'10:00',end:'12:00',source:'cancellation'}];
+  const times=slotsForDate('sample',date,60,s,NOW).map(x=>x.time);
+  assert.deepEqual(times,['10:00','10:30','11:00']);
+  assert.equal(isSlotOpen('sample',slot('10:00'),s,NOW),true);
+  assert.equal(isSlotOpen('sample',slot('09:30'),s,NOW),false);
+});
+
+test('overlapping one-off and regular hours never duplicate a slot',()=>{
+  const s=state();
+  s.oneOffWindows=[{id:'gap',instructorId:'sample',date,start:'10:00',end:'12:00',source:'extra'}];
+  const times=slotsForDate('sample',date,60,s,NOW).map(x=>x.time);
+  assert.equal(times.filter(x=>x==='10:00').length,1);
+  assert.equal(times.filter(x=>x==='11:00').length,1);
+});
+
+test('blocked time and requested lessons take priority over an ad-hoc opening',()=>{
+  const s=state();s.weeklyWindows=[];
+  s.oneOffWindows=[{id:'cancel',instructorId:'sample',date,start:'12:00',end:'15:00',source:'cancellation'}];
+  s.diaryBlocks=[{id:'off',instructorId:'sample',date,start:'12:30',end:'13:30',note:'Unavailable'}];
+  assert.equal(isSlotOpen('sample',slot('12:30'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('14:00'),s,NOW),true);
+  s.diaryBlocks=[];
+  s.lessons=[{id:'1',instructorId:'sample',status:'requested',date,time:'13:00',duration:60}];
+  assert.equal(isSlotOpen('sample',slot('13:00'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('14:00'),s,NOW),false);
+});
+
+test('last-minute openings respect UK lead time and avoid midnight',()=>{
+  assert.deepEqual(suggestedOpening(NOW),{date:'2026-11-13',start:'08:30',end:'09:30'});
+  assert.deepEqual(suggestedOpening(new Date('2026-11-13T23:40:00Z')),{date:'2026-11-14',start:'09:00',end:'10:00'});
+  const s=state();s.weeklyWindows=[];
+  s.oneOffWindows=[{id:'soon',instructorId:'sample',date,start:'08:00',end:'10:00',source:'extra'}];
+  assert.equal(isSlotOpen('sample',slot('08:00'),s,NOW),false);
+  assert.equal(isSlotOpen('sample',slot('08:30'),s,NOW),true);
 });

@@ -38,19 +38,33 @@ export function ukClock(now=new Date()):{date:string;minutes:number} {
   const obj=Object.fromEntries(parts.map(p=>[p.type,p.value]));
   return {date:`${obj.year}-${obj.month}-${obj.day}`, minutes:Number(obj.hour)*60+Number(obj.minute)};
 }
+/** Suggested short-notice opening in the UK, with 30-minute notice and a full hour. */
+export function suggestedOpening(now=new Date()):{date:string;start:string;end:string} {
+  const clock=ukClock(now);
+  const next=Math.ceil((clock.minutes+MIN_NOTICE_MINUTES)/STEP_MINUTES)*STEP_MINUTES;
+  if(next+60<1440)return {date:clock.date,start:minuteTime(next),end:minuteTime(next+60)};
+  return {date:isoDay(clock.date,1),start:'09:00',end:'10:00'};
+}
 export function formatDay(date:string):string {
   return new Date(date+'T12:00:00Z').toLocaleDateString('en-GB',{timeZone:'UTC',weekday:'short',day:'numeric',month:'short'});
 }
 export function slotsForDate(instructorId:string,date:string,duration:number,state:DemoState,now=new Date()):SlotSelection[] {
   if(![60,90,120].includes(duration)) return [];
-  const windows=state.weeklyWindows.filter(w=>w.instructorId===instructorId && w.weekday===weekday(date));
+  const windows=[
+    ...state.weeklyWindows.filter(w=>w.instructorId===instructorId && w.weekday===weekday(date)),
+    ...(state.oneOffWindows??[]).filter(w=>w.instructorId===instructorId && w.date===date)
+  ];
   const results:SlotSelection[]=[];
+  const unique=new Set<string>();
   for(const window of windows) {
     const start=timeMinutes(window.start), end=timeMinutes(window.end);
     if(!validWindow(window.start,window.end))continue;
     for(let candidate=Math.ceil(start/STEP_MINUTES)*STEP_MINUTES; candidate+duration<=end;candidate+=STEP_MINUTES) {
       const slot={date,time:minuteTime(candidate),duration};
-      if(isSlotOpen(instructorId,slot,state,now)) results.push(slot);
+      if(!unique.has(slot.time)&&isSlotOpen(instructorId,slot,state,now)){
+        results.push(slot);
+        unique.add(slot.time);
+      }
     }
   }
   return results.sort((a,b)=>a.time.localeCompare(b.time));
@@ -77,8 +91,11 @@ export function isSlotOpen(instructorId:string,slot:SlotSelection,state:DemoStat
   // that crosses midnight. This is scheduling logic, not UTC booking storage.
   const dayOffset=Math.round((Date.parse(slot.date+'T00:00:00Z')-Date.parse(clock.date+'T00:00:00Z'))/86400000);
   if(dayOffset*1440+start<clock.minutes+MIN_NOTICE_MINUTES)return false;
-  if(!state.weeklyWindows.some(w=>w.instructorId===instructorId && w.weekday===weekday(slot.date) &&
-    validWindow(w.start,w.end) && start>=timeMinutes(w.start) && start+slot.duration<=timeMinutes(w.end)))return false;
+  const regular=state.weeklyWindows.some(w=>w.instructorId===instructorId && w.weekday===weekday(slot.date) &&
+    validWindow(w.start,w.end) && start>=timeMinutes(w.start) && start+slot.duration<=timeMinutes(w.end));
+  const oneOff=(state.oneOffWindows??[]).some(w=>w.instructorId===instructorId && w.date===slot.date &&
+    validWindow(w.start,w.end) && start>=timeMinutes(w.start) && start+slot.duration<=timeMinutes(w.end));
+  if(!regular&&!oneOff)return false;
   if(state.diaryBlocks.some(b=>b.instructorId===instructorId && blocksSlot(b,slot)))return false;
   if(state.lessons.some(l=>l.instructorId===instructorId && lessonOverlaps(l,slot)))return false;
   return true;
