@@ -3,7 +3,7 @@ import {
   ArrowLeft, ArrowRight, BadgeCheck, Bell, CalendarDays, CarFront, Check, CheckCircle2,
   ChevronDown, ChevronRight, CircleHelp, Clock3, Coins, CreditCard, Gauge, Home,
   LocateFixed, MapPin, Menu, Navigation2, Play, RotateCcw, Search, ShieldCheck,
-  SlidersHorizontal, Sparkles, Star, SteeringWheel, Timer, UserRound, Wallet, X,
+  SlidersHorizontal, Sparkles, Star, Gauge as SteeringWheel, Timer, UserRound, Wallet, X,
   Zap, type LucideIcon
 } from 'lucide-react';
 import {
