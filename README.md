@@ -112,3 +112,13 @@ The demo must **not** be used to accept real learners or instructor payments. A 
 - Prices displayed in GBP (£), UK-centric copy and sample Leeds location
 
 © 2026 DriveNow concept. All example profiles fictional.
+
+## Learner skill scoring and instructor ratings (November 2026)
+
+- A **learner** gives their own skill an initial score (1–10) **once during sign-up**. The initial score is stored in `learner_profiles.self_assessed_skill` by the Supabase authentication signup trigger when the backend is configured. The learner is NOT asked to reassess after a lesson.
+- After a **completed** lesson, the **learner** rates the **instructor** from 1 to 5 stars. That rating can only be saved once per lesson in the prototype.
+- After a **completed** lesson, the **instructor** assesses the **learner** from 1 to 10. That assessment can only be saved once per lesson in the prototype.
+- The learner's displayed skill starts at the self-rating and, as soon as one instructor score exists, becomes the arithmetic mean of **instructor scores only**, rounded to one decimal. Sign-up rating never contributes to that average.
+- Sample demo ratings persist in this browser's local demo state. In test mode, learners can skip personal details and optionally select a different initial skill level (defaults to 5/10). They can run a demo lesson to completion, review the instructor, switch to the instructor dashboard, and rate the learner.
+- **Backend work remains:** real lesson records, authenticated post-lesson feedback, server-side proof of completion, participant-scoped write permissions, review rate limiting, and abuse handling. Demo ratings are not public production reviews or verified skill records.
+- For existing Supabase projects, rerun the latest `supabase-schema.sql` so the learner profile includes `self_assessed_skill`. Existing rows can remain null until a migration/backfill strategy is agreed.
