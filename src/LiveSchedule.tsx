@@ -90,7 +90,10 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
           setBlocks((blockResult.data??[]) as BlockRow[]);
         }
       }catch(e){
-        if(active)setError(e instanceof Error?e.message:'Could not load live availability. Try refreshing.');
+        if(active){
+          setListings([]);setWindows([]);setBlocks([]);
+          setError(e instanceof Error?e.message:'Could not load live availability. Try refreshing.');
+        }
       }finally{if(active)setLoading(false);}
     }
     void load();
