@@ -1,3 +1,15 @@
+## One-off availability for cancellations and last-minute lessons (November 2026)
+
+**New: instructor ad-hoc openings.** A signed-in test instructor opens **My live diary · test** and adds an individual date and time under **One-off availability**. They can choose **Cancellation / gap opened up** or **Extra one-off availability**, use Today/Tomorrow/next suitable hour shortcuts, and remove an entry later. This does **not** alter their normal recurring weekly hours. Openings are saved in the Supabase table `instructor_live_openings`; access is restricted by owner-bound RLS. A signed-in learner using **Live slots · test** sees these windows when the instructor has chosen to publish their test calendar. Cancellation openings receive a visible label in available-slot results, including the Book now preview.
+
+The shared scheduling engine merges recurring weekly hours and one-off openings without duplicating slots, applies existing time-off blocks and demo lesson conflicts, and preserves a **30-minute minimum notice** measured in Europe/London time. One-off openings may be on days when regular working hours are closed, but cannot override blocked time off. The demo instructor diary also supports one-off openings in localStorage and the same search rules. Reset demo clears these, but **never** changes Supabase.
+
+**Testing:** Register and sign into an instructor test account. Publish their availability, enter a cancellation opening for today with at least 30 minutes notice, then use the learner account on another device to open Live slots · test → Book now preview → Refresh. You should see the newly listed time labelled as a cancellation gap. Remove the opening from the instructor's diary, refresh the learner listing and confirm that it disappears. For longer notice, use Book ahead preview. All listed times are **view-only**; no actual booking, payment, cancellation of a lesson, licence check, or automatic waitlist notification is performed.
+
+The SQL change was applied as migrations `drivenow_instructor_ad_hoc_openings` and `fix_one_off_minimum_notice_midnight`. The canonical fresh-install table schema is in `supabase-ad-hoc-availability.sql`.
+
+---
+
 ## Connected live instructor availability — TEST ONLY (13 November 2026)
 
 A separate Supabase-backed instructor diary and learner availability browser have been added beside the fictional booking demo. This is **not a reservation system**: there are no booking rows, holds, payment integrations or licence/ADI approvals in Supabase.

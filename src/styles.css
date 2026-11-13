@@ -180,3 +180,37 @@
 .live-explore-callout button{border:1px solid #7544cd;background:#7544cd;color:#fff;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 14px;border-radius:9px;font-size:.77rem;font-weight:800}
 @media(max-width:1050px){.live-two-col{grid-template-columns:1fr}.live-search-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.live-slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.live-head,.live-publish,.live-explore-callout{flex-direction:column;align-items:stretch}.live-panel{gap:13px}.live-card{padding:17px}.live-search-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.live-slot-grid{grid-template-columns:1fr}.live-result-header{flex-direction:column}.live-toggle{white-space:normal}.live-explore-callout button,.live-refresh{align-self:flex-start}.live-warning{font-size:.75rem}}
+
+/* One-off instructor openings and last-minute cancellation availability */
+.live-oneoff-card,.diary-oneoff{border:1px solid #ddcaf9;background:linear-gradient(120deg,#fff,#faf7ff)}
+.live-oneoff-heading{display:flex;gap:14px;align-items:flex-start;margin-bottom:11px}
+.live-oneoff-icon{display:grid;place-items:center;flex:none;width:44px;height:44px;color:#fff;background:#7143cf;border-radius:13px}
+.live-oneoff-heading .eyebrow{font-size:.68rem}
+.live-oneoff-heading h2{margin:4px 0 5px;font-size:1.2rem}
+.live-oneoff-heading p{font-size:.78rem;max-width:670px;line-height:1.55;margin:0}
+.live-oneoff-quick{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.live-oneoff-quick button{border-radius:999px;border:1px solid #dac6f6;color:#6644a0;background:#f4edff;padding:8px 13px;font-size:.75rem;font-weight:750}
+.live-oneoff-quick button:hover{background:#eadcff}
+.live-oneoff-fields{display:grid;grid-template-columns:1.6fr 1.05fr 1fr 1fr;gap:12px;align-items:end;margin:13px 0}
+.live-oneoff-fields label{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:.74rem;color:#5b5068;font-weight:800}
+.live-oneoff-fields input,.live-oneoff-fields select{min-width:0;width:100%;min-height:43px;border:1px solid #e4daef;border-radius:10px;padding:10px 11px;color:#312944;background:#fff}
+.live-oneoff-submit{display:flex;align-items:center;justify-content:center;gap:9px;border-radius:10px;padding:12px 18px;background:#7442d2;color:white;font-size:.8rem;font-weight:800}
+.live-oneoff-submit:disabled{opacity:.48}
+.live-opening-list-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 0 10px}
+.live-opening-list-head h3{margin:0;font-size:.85rem}
+.live-opening-list-head small{font-size:.71rem;color:#887993}
+.live-openings-list{display:grid;gap:8px}
+.live-openings-list>div{display:flex;gap:12px;align-items:center;padding:11px 12px;border:1px solid #eadff6;border-radius:11px;background:#fff}
+.live-oneoff-label{font-size:.67rem;font-weight:800;border-radius:999px;background:#fff1cf;color:#93630f;padding:7px 10px;white-space:nowrap}
+.live-oneoff-time{flex:1;min-width:0}
+.live-oneoff-time strong{display:block;font-size:.77rem;color:#483857}
+.live-oneoff-time small{display:block;font-size:.69rem;color:#877693;margin-top:4px}
+.live-openings-list button{background:transparent;color:#9d638a;border-radius:9px;padding:7px}
+.live-openings-list button:disabled{opacity:.4}
+.live-opening-list-head + .diary-empty{margin-bottom:0}
+.live-oneoff-note{font-size:.73rem!important;color:#887996!important;margin:14px 0 0!important;line-height:1.5!important}
+.live-cancellation-alert{display:flex;align-items:center;gap:9px;border-radius:10px;background:#fff4d9;color:#835718!important;padding:10px 12px;margin-bottom:16px!important;font-weight:800;font-size:.75rem!important}
+.live-cancellation-tag{display:inline-flex;align-items:center;gap:4px;background:#fff0cd;color:#92610d;border-radius:999px;padding:5px 8px;font-weight:800;font-size:.65rem}
+.diary-oneoff .live-oneoff-fields{margin:13px 0}
+@media(max-width:850px){.live-oneoff-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.live-oneoff-heading{gap:10px}.live-oneoff-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.live-oneoff-fields label:first-child{grid-column:1/-1}.live-oneoff-quick button{font-size:.69rem;padding:8px 10px}.live-openings-list>div{gap:8px;flex-wrap:wrap}.live-oneoff-time{flex-basis:55%}.live-oneoff-label{font-size:.62rem}.live-openings-list button{margin-left:auto}}
