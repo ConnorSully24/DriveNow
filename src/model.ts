@@ -41,11 +41,16 @@ export interface Lesson {
   status: LessonStatus;
   startedAt?: string;
   completedAt?: string;
+  /** Learner rates instructor out of five after completion. */
+  learnerInstructorRating?: number;
+  /** Instructor rates learner skill out of ten after completion. */
+  instructorLearnerSkill?: number;
 }
 
 export interface DemoState {
   lessons: Lesson[];
   instructorOnline: boolean;
+  learnerSelfSkill: number;
 }
 
 export const INSTRUCTORS: Instructor[] = [
@@ -63,7 +68,7 @@ export const DEFAULT_PREFS: SearchPreferences = {
   time: '14:00'
 };
 
-export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true };
+export const INITIAL_STATE: DemoState = { lessons: [], instructorOnline: true, learnerSelfSkill: 5 };
 export const STATE_KEY = 'drivenow-demo-v1';
 
 export function loadDemoState(): DemoState {
@@ -73,7 +78,8 @@ export function loadDemoState(): DemoState {
     const parsed: unknown = JSON.parse(value);
     if (parsed && typeof parsed === 'object' && 'lessons' in parsed && Array.isArray(parsed.lessons)) {
       const input = parsed as DemoState;
-      return { lessons: input.lessons, instructorOnline: input.instructorOnline !== false };
+      return { lessons: input.lessons, instructorOnline: input.instructorOnline !== false,
+        learnerSelfSkill: Number.isInteger(input.learnerSelfSkill) && input.learnerSelfSkill >= 1 && input.learnerSelfSkill <= 10 ? input.learnerSelfSkill : 5 };
     }
   } catch { /* damaged storage falls back to a clean demo */ }
   return INITIAL_STATE;
@@ -94,4 +100,12 @@ export function prettyStatus(status: LessonStatus) {
     in_progress: 'Lesson in progress', completed: 'Completed', declined: 'Declined', cancelled: 'Cancelled'
   };
   return names[status];
+}
+
+/** Instructor assessments supersede the one-time signup estimate. */
+export function getDisplaySkill(state: DemoState): { score: number; source: 'self' | 'instructors'; count: number } {
+  const scores = state.lessons.filter(l => l.status === 'completed').map(l => l.instructorLearnerSkill)
+    .filter((v): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 10);
+  if (!scores.length) return { score: state.learnerSelfSkill, source: 'self', count: 0 };
+  return { score: Math.round(scores.reduce((a,b)=>a+b,0) / scores.length * 10) / 10, source: 'instructors', count: scores.length };
 }
