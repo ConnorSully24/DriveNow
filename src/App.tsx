@@ -3,7 +3,7 @@ import {
   ArrowLeft, ArrowRight, BadgeCheck, Bell, CalendarDays, CarFront, Check, CheckCircle2,
   ChevronDown, ChevronRight, CircleHelp, Clock3, Coins, CreditCard, Gauge, Home,
   LocateFixed, MapPin, Menu, Navigation2, Play, RotateCcw, Search, ShieldCheck,
-  SlidersHorizontal, Sparkles, Star, Gauge as SteeringWheel, Timer, UserRound, Wallet, X,
+  SlidersHorizontal, Star, Gauge as SteeringWheel, Timer, UserRound, Wallet, X,
   Zap, type LucideIcon
 } from 'lucide-react';
 import LearnerAccount from './LearnerAccount';
@@ -29,7 +29,7 @@ function Brand({ light = false }: { light?: boolean }) {
   return <div className={`brand ${light ? 'brand-light' : ''}`}>
     <span className="brand-icon"><CarFront size={22} strokeWidth={2.6} /></span>
     <span>Drive<span className="brand-now">Now</span></span>
-    <small>DEMO</small>
+    <small>TEST</small>
   </div>;
 }
 
@@ -271,15 +271,15 @@ function App() {
   return <div className="app-shell">
     <aside className={`sidebar ${menuOpen ? 'sidebar-open' : ''}`}>
       <div className="sidebar-top"><Brand light/><button className="sidebar-close icon-button" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={20}/></button></div>
-      <div className="sidebar-badge"><Sparkles size={15}/> CONCEPT PROTOTYPE</div>
-      <p className="sidebar-copy">Driving lessons, at your fingertips.</p>
+      <div className="sidebar-badge"><span className="sidebar-badge-line"/> DRIVE NOW / EARLY ACCESS</div>
+      <p className="sidebar-copy">A better way to find time behind the wheel.</p>
       <nav className="side-nav" aria-label="Main menu">
         {navItems.filter(item => item.role === role).map(item => <button key={item.key} className={`side-link ${page === item.key ? 'side-link-active' : ''}`} onClick={() => { setPage(item.key); setMenuOpen(false); }}><item.icon size={19}/>{item.label}</button>)}
         <button className={`side-link ${page==='live-slots'?'side-link-active':''}`} onClick={()=>{setPage('live-slots');setMenuOpen(false);}}><Search size={19}/> Live slots · test</button>
         <button className={`side-link ${page==='live-diary'?'side-link-active':''}`} onClick={()=>{setPage('live-diary');setMenuOpen(false);}}><CalendarDays size={19}/> My live diary · test</button>
       </nav>
       <div className="sidebar-spacer"/>
-      <div className="sidebar-feature"><span><Zap size={17} fill="currentColor"/></span><strong>Built for the moment</strong><p>Find a lesson or fill an empty diary slot.</p></div>
+      <div className="sidebar-feature"><span className="sidebar-feature-index">01 / 03</span><strong>More time on the road.</strong><p>Explore a test lesson or manage your availability.</p></div>
       <div className="role-block"><span>DEMO VIEW</span><div className="role-switch"><button className={role === 'learner' ? 'active' : ''} onClick={() => switchRole('learner')}>Learner</button><button className={role === 'instructor' ? 'active' : ''} onClick={() => switchRole('instructor')}>Instructor</button></div></div>
       <button className="reset-link" onClick={resetDemo}><RotateCcw size={15}/> Reset demo</button>
     </aside>
@@ -297,16 +297,32 @@ function App() {
         {page === 'live-diary' && <LiveSchedule view="instructor" onOpenAccount={()=>setPage('signup')}/>}
         {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={(demoRole, initialLearnerSkill) => { if (demoRole === 'learner' && initialLearnerSkill != null) setDemo(prev => ({...prev, learnerSelfSkill: initialLearnerSkill})); switchRole(demoRole); }} />}
         {role === 'learner' && page === 'home' && <>
-          <section className="hero">
-            <div className="hero-copy"><span className="hero-kicker"><Zap size={15} fill="currentColor"/> YOUR NEXT LESSON, SORTED</span>
-              <h1>More driving.<br/><em>Less waiting.</em></h1>
-              <p>Find a driving instructor who has a spare slot — today, tomorrow or whenever you're ready.</p>
-              <Button icon={ArrowRight} onClick={() => showSchedule('ahead')}>Find a lesson</Button>
-              <div className="hero-trust"><IconLabel icon={Clock3}>Short-notice slots</IconLabel><IconLabel icon={ShieldCheck}>Verified instructors planned</IconLabel></div>
-            </div>
-            <div className="hero-visual"><div className="hero-circle circle-a"/><div className="hero-circle circle-b"/><div className="floating-card floating-card-top"><span className="floating-icon"><Zap size={18}/></span><div><strong>Slot available</strong><span>Today · 2:30 PM</span></div></div><div className="hero-car"><CarFront size={125} strokeWidth={1.3}/></div><div className="floating-card floating-card-bottom"><span className="rating-star"><Star size={17} fill="currentColor"/></span><div><strong>4.9 out of 5</strong><span>Example instructor rating</span></div></div></div>
-          </section>
-          <div className="live-explore-callout"><div><span className="eyebrow">NEW · SUPABASE TEST</span><strong>Explore real instructor-entered availability</strong><p>See schedules synced across phones. No real reservations or payments.</p></div><button type="button" onClick={()=>setPage('live-slots')}>Browse live test slots <ArrowRight size={17}/></button></div>
+          <section className="hero editorial-hero" aria-labelledby="home-hero-heading">
+             <div className="hero-copy">
+               <span className="hero-kicker"><span className="hero-kicker-rule"/> MADE FOR YOUR SCHEDULE</span>
+               <h1 id="home-hero-heading">Driving lessons<br/>that fit <em>your day.</em></h1>
+               <p>Plans change. Good driving lessons should fit around them. Find room to practise, whether it's a regular lesson or a last-minute gap.</p>
+               <div className="hero-actions">
+                 <Button icon={ArrowRight} onClick={() => showSchedule('ahead')}>Explore the demo</Button>
+                 <button type="button" className="hero-quiet-link" onClick={() => setPage('live-slots')}>See live test slots <ArrowRight size={17}/></button>
+               </div>
+               <div className="hero-trust"><span>01 / Search for a time</span><span>02 / Find an instructor</span><span>03 / Get moving</span></div>
+             </div>
+             <div className="hero-visual" aria-hidden="true">
+               <span className="hero-art-index">LEEDS / DRIVING LESSONS</span>
+               <svg className="hero-route-art" viewBox="0 0 520 480" fill="none" preserveAspectRatio="xMidYMid slice">
+                 <path d="M572 -55C426 26 535 102 356 176C178 251 209 336 75 525" stroke="#b3c8b9" strokeWidth="86" strokeLinecap="round"/>
+                 <path d="M572 -55C426 26 535 102 356 176C178 251 209 336 75 525" stroke="#eff3eb" strokeWidth="60" strokeLinecap="round"/>
+                 <path d="M572 -55C426 26 535 102 356 176C178 251 209 336 75 525" stroke="#aec2b3" strokeWidth="2" strokeDasharray="9 14" strokeLinecap="round"/>
+                 <circle cx="357" cy="175" r="19" fill="#304e40" stroke="#e5ebdf" strokeWidth="8"/>
+                 <circle cx="194" cy="365" r="9" fill="#b17656" stroke="#e5ebdf" strokeWidth="5"/>
+               </svg>
+               <div className="hero-art-note"><span>LESSONS FOR REAL LIFE</span><strong>A little more<br/>time to drive.</strong><small>Regular lessons and last-minute openings, all in one place.</small></div>
+               <span className="hero-art-footer">THE ROAD AHEAD <span>—</span> ON YOUR TERMS</span>
+             </div>
+           </section>
+          <div className="journey-heading"><span className="eyebrow">CHOOSE YOUR NEXT STEP</span><h2>A way forward, whatever your diary looks like.</h2></div>
+           <div className="live-explore-callout"><div><span className="eyebrow">LIVE CALENDAR / TEST ONLY</span><strong>See instructor availability across devices</strong><p>See schedules synced across phones. No real reservations or payments.</p></div><button type="button" onClick={()=>setPage('live-slots')}>Browse live test slots <ArrowRight size={17}/></button></div>
            <div className="booking-entry-grid" aria-label="Choose how to book">
              <button type="button" onClick={()=>showSchedule('now')}><Zap size={27}/><strong>Book now</strong><span>Short-notice lesson slots</span><ArrowRight size={18}/></button>
              <button type="button" onClick={()=>showSchedule('ahead')}><CalendarDays size={27}/><strong>Book ahead</strong><span>Pick a day and time</span><ArrowRight size={18}/></button>
@@ -387,7 +403,7 @@ function App() {
         </>}
 
         {role === 'instructor' && page === 'instructor' && <>
-          <section className="instructor-welcome"><div><span className="eyebrow">INSTRUCTOR PORTAL · DEMO</span><h1>Good to see you, {activeInstructor.name.split(' ')[0]}. <span>👋</span></h1><p>Turn your unused availability into extra lessons.</p></div><label className="instructor-picker">Demo instructor profile <span><select aria-label="Choose instructor profile" value={instructorAccountId} onChange={event => setInstructorAccountId(event.target.value)}>{INSTRUCTORS.map(i => <option key={i.id} value={i.id}>{i.name} · {i.transmission.join('/')}</option>)}</select><ChevronDown size={16}/></span></label></section>
+          <section className="instructor-welcome"><div><span className="eyebrow">INSTRUCTOR WORKSPACE / DEMO</span><h1>Make room for <em>another lesson.</em></h1><p>Welcome back, {activeInstructor.name.split(' ')[0]}. Your teaching week, without the clutter.</p></div><label className="instructor-picker">Demo instructor profile <span><select aria-label="Choose instructor profile" value={instructorAccountId} onChange={event => setInstructorAccountId(event.target.value)}>{INSTRUCTORS.map(i => <option key={i.id} value={i.id}>{i.name} · {i.transmission.join('/')}</option>)}</select><ChevronDown size={16}/></span></label></section>
           <div className="stat-grid"><div className="stat-card stat-availability"><div className="stat-icon"><Zap size={19}/></div><span>AVAILABILITY</span><strong>{demo.instructorOnline ? 'Online' : 'Offline'}</strong><label className="toggle-row">{demo.instructorOnline ? 'Accepting requests' : 'Not accepting requests'}<input aria-label="Available for new bookings" type="checkbox" checked={demo.instructorOnline} onChange={e => setDemo(prev => ({...prev, instructorOnline: e.target.checked}))}/><span className="switch-track"/></label></div>
             <div className="stat-card"><div className="stat-icon icon-violet"><CalendarDays size={20}/></div><span>YOUR REQUESTS</span><strong>{activeRequests.length}</strong><small>Pending response</small></div>
             <div className="stat-card"><div className="stat-icon icon-gold"><Coins size={20}/></div><span>DEMO EARNINGS</span><strong>{formatGBP(earnings)}</strong><small>Completed lesson value</small></div></div>
