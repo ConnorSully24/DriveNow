@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CalendarDays, CheckCircle2, Clock3, Plus, RefreshCw, Zap, ShieldAlert, Trash2, UserRound } from 'lucide-react';
+import { ArrowRight, CalendarDays, CheckCircle2, Clock3, Plus, RefreshCw, Zap, Bell, ShieldAlert, Trash2, UserRound } from 'lucide-react';
 import { supabase } from './auth';
 import type { DemoState, DiaryBlock, OneOffWindow, SlotSelection, Transmission, WeeklyWindow } from './model';
 import { availableRecurringSeries, DAYS, formatDay, isoDay, seriesAvailable, slotsForDate, suggestedOpening, timeMinutes, ukClock, validWindow } from './scheduling';

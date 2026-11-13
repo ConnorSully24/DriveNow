@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Bell, BellOff, Check, Clock3, RefreshCw, ShieldAlert, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bell, BellOff, Check, RefreshCw, ShieldAlert, Zap } from 'lucide-react';
 import { supabase } from './auth';
 import { formatDay, ukClock } from './scheduling';
 
