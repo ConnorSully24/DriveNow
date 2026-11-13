@@ -1,4 +1,4 @@
-import type { DemoState, DiaryBlock, Lesson, SlotSelection, WeeklyWindow } from './model';
+import type { DemoState, DiaryBlock, Lesson, SlotSelection } from './model';
 
 // These utilities power a single-browser DEMO. Production slot reservations require
 // server-side exclusion constraints and transactional holds across all users.

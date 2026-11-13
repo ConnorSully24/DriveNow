@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, CalendarDays, Clock3, Layers3, MapPin, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, Layers3, MapPin, ShieldCheck, Zap } from 'lucide-react';
 import type { BookingMode, DemoState, Instructor, SearchPreferences, SlotSelection, Transmission } from './model';
 import { formatGBP } from './model';
-import { availableRecurringSeries, formatDay, isoDay, isSlotOpen, seriesAvailable, slotsForDate, timeMinutes, ukClock } from './scheduling';
+import { availableRecurringSeries, formatDay, isoDay, seriesAvailable, slotsForDate, timeMinutes, ukClock } from './scheduling';
 
 interface Props {
   initialMode: BookingMode;
@@ -37,7 +37,7 @@ export default function BookingSchedule({initialMode,prefs,onPrefs,instructorId,
   function go(){
     if(prefs.location.trim().length<3){setError('Enter a pick-up postcode or area.');return;}
     if(!ready||!instructor){setError('Select available lesson times before continuing.');return;}
-    onProceed(chosen.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)),instructor.id);
+    onProceed(chosen.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)),instructor.id);
   }
   function chooseSingle(slot:SlotSelection){setChosen([slot]);setError('');}
   function chooseWeekly(series:SlotSelection[]){setChosen(series);setError('');}
