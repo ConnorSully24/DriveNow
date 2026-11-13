@@ -46,10 +46,8 @@ create policy "Instructors insert own future one-off openings"
     (select auth.uid()) = instructor_id
     and opening_date between (now() at time zone 'Europe/London')::date
                          and ((now() at time zone 'Europe/London')::date + 90)
-    and (
-      opening_date > (now() at time zone 'Europe/London')::date
-      or start_time >= ((now() at time zone 'Europe/London')::time + interval '30 minutes')::time
-    )
+    and (opening_date + start_time) >=
+        ((now() at time zone 'Europe/London') + interval '30 minutes')
   );
 
 create policy "Instructors delete own one-off openings"
