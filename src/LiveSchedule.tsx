@@ -97,6 +97,14 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
     return ()=>{active=false;};
   },[userId,view,reload]);
 
+  // Poll published test schedules so changes from other devices appear without a reload.
+  // Manual Refresh is also available. This is not a booking or reservation lock.
+  useEffect(()=>{
+    if(!userId)return;
+    const timer=window.setInterval(()=>setReload(value=>value+1),30000);
+    return ()=>window.clearInterval(timer);
+  },[userId,view]);
+
   const own=listings.find(l=>l.user_id===userId);
   const visible=listings.filter(l=>l.published&&publicTransmission(l.transmission,transmission));
   const activeId=visible.some(x=>x.user_id===selectedInstructor)?selectedInstructor:(visible[0]?.user_id??'');

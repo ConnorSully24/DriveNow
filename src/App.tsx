@@ -258,7 +258,7 @@ function App() {
         <button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setMenuOpen(true)}><Menu size={23}/></button>
         <div className="topbar-mobile-brand"><Brand/></div>
         <div className="topbar-breadcrumb">UK launch concept <ChevronRight size={14}/> {role === 'learner' ? 'Learner experience' : 'Instructor experience'}</div>
-        <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
+        <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> {page==='live-diary'||page==='live-slots'?'LIVE DATA · TEST ONLY':'DEMO MODE'}</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
         {page === 'live-slots' && <LiveSchedule view="learner" onOpenAccount={()=>setPage('signup')}/>}

@@ -1,3 +1,17 @@
+## Connected live instructor availability — TEST ONLY (13 November 2026)
+
+A separate Supabase-backed instructor diary and learner availability browser have been added beside the fictional booking demo. This is **not a reservation system**: there are no booking rows, holds, payment integrations or licence/ADI approvals in Supabase.
+
+**Test instructor workflow:** On the live DriveNow site, use **Account / Sign up** to register as an Instructor with a different test email from an existing learner account, confirm the email and sign in. Open **My live diary · test** in the side menu (or choose **Manage my Supabase availability** from the Instructor demo dashboard). Add recurring weekly working hours and full-day or partial-day time-off blocks. Changes are saved in Supabase. Turn on **Publish test availability** to allow other signed-in accounts to see the test schedule. Publishing does not verify or approve an instructor.
+
+**Test learner workflow:** Sign in to a learner account, open **Live slots · test** in the side menu or use **Browse live test slots** on Discover. Find published test instructors and inspect upcoming one-off starts or a complete recurring five-/ten-week block pattern. Individual date selections are also supported for a block **preview**. There is deliberately **no Reserve/Book/Pay button** here. Scheduling information updates after Refresh or within roughly 30 seconds.
+
+**Database:** `supabase-live-availability.sql` (applied as `drivenow_live_instructor_availability_test`) creates `instructor_live_listings`, `instructor_live_windows`, and `instructor_live_blocks` with owner-only writes and row-level security. Public display name is first name plus last initial. Test listings are private by default; authenticated learners can only read published test data. Personal instructor profiles and verification records remain private. The availability blocks contain **no private notes**. Every query uses a signed-in user; anonymous visitors cannot read test calendars. No instructor data was invented or prepopulated.
+
+**Production requirements:** independently verify instructors and learner entitlements, implement authenticated server-only booking and transactional no-overlap holds (including block bookings), add secure payments/cancellations/refunds and moderation, then design a true public directory. Demo requests remain browser-local and never touch these test tables.
+
+---
+
 
 ### Supabase test project connected (13 November 2026)
 

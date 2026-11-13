@@ -59,6 +59,15 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 - [ ] Learner and instructor see the same committed schedule.
 **Acceptance:** two different accounts cannot book an overlapping slot, even when they click simultaneously.
 
+## Live scheduling milestone (13 November 2026)
+- [x] Create three RLS-secured Supabase instructor live scheduling tables (directory, weekly windows and exceptions).
+- [x] Link schedules to authenticated instructor profile IDs; only the owner may write.
+- [x] Allow instructors to opt in to publishing their TEST availability; default private.
+- [x] Connect responsive instructor edit screen and signed-in learner slot/block previews across devices, with Refresh/30-second polling.
+- [ ] Verify instructor sign-up and cross-device behaviour with two independently created test accounts.
+- [ ] Implement server-side holds and shared booking data before enabling even test reservations.
+- [ ] Independently verify credentials before listing any instructor as approved or offering paid lessons.
+
 ## Phase 2 — Payments, communication, and cancellations (P0 for launch)
 - [ ] Investigate Stripe Connect for payment collection, fee display, instructor onboarding and payouts.
 - [ ] Payment confirmation tied to validated booking and available slot hold; no charge for an unavailable slot.
