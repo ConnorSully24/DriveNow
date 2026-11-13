@@ -13,7 +13,7 @@ import LiveSchedule from './LiveSchedule';
 import { formatDay, seriesAvailable } from './scheduling';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
-  prettyDate, prettyStatus, getDisplaySkill, type BookingMode, type SlotSelection, type DiaryBlock, type WeeklyWindow, type DemoState, type Instructor, type Lesson,
+  prettyDate, prettyStatus, getDisplaySkill, type BookingMode, type SlotSelection, type DiaryBlock, type OneOffWindow, type WeeklyWindow, type DemoState, type Instructor, type Lesson,
   type LessonStatus, type Page, type SearchPreferences, type Timing, type Transmission
 } from './model';
 
@@ -380,6 +380,8 @@ function App() {
             onRemoveWindow={(id:string)=>setDemo(prev=>({...prev,weeklyWindows:prev.weeklyWindows.filter(w=>w.id!==id)}))}
             onAddBlock={(b:DiaryBlock)=>setDemo(prev=>({...prev,diaryBlocks:[...prev.diaryBlocks,b]}))}
             onRemoveBlock={(id:string)=>setDemo(prev=>({...prev,diaryBlocks:prev.diaryBlocks.filter(b=>b.id!==id)}))}
+            onAddOpening={(opening:OneOffWindow)=>setDemo(prev=>({...prev,oneOffWindows:[...prev.oneOffWindows,opening]}))}
+            onRemoveOpening={(id:string)=>setDemo(prev=>({...prev,oneOffWindows:prev.oneOffWindows.filter(w=>w.id!==id)}))}
           />
         </>}
       </main>

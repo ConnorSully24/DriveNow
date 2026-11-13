@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CalendarDays, Clock3, Ban, Plus, Trash2, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { DemoState, DiaryBlock, Instructor, WeeklyWindow } from './model';
-import { DAYS, formatDay, isoDay, minuteTime, slotsForDate, timeMinutes, ukClock, validWindow } from './scheduling';
+import type { DemoState, DiaryBlock, Instructor, OneOffWindow, WeeklyWindow } from './model';
+import { DAYS, formatDay, isoDay, minuteTime, suggestedOpening, slotsForDate, timeMinutes, ukClock, validWindow } from './scheduling';
 
 interface Props {
   instructor: Instructor;
@@ -10,9 +10,16 @@ interface Props {
   onRemoveWindow: (id:string) => void;
   onAddBlock: (block:DiaryBlock) => void;
   onRemoveBlock: (id:string) => void;
+  onAddOpening: (opening:OneOffWindow) => void;
+  onRemoveOpening: (id:string) => void;
 }
 const makeId=()=>typeof crypto!=='undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : 'demo-'+Date.now();
-export default function InstructorDiary({instructor,demo,onAddWindow,onRemoveWindow,onAddBlock,onRemoveBlock}:Props) {
+const initialOpening=suggestedOpening();
+export default function InstructorDiary({instructor,demo,onAddWindow,onRemoveWindow,onAddBlock,onRemoveBlock,onAddOpening,onRemoveOpening}:Props) {
+  const [oneOffDate,setOneOffDate]=useState(initialOpening.date);
+  const [oneOffStart,setOneOffStart]=useState(initialOpening.start);
+  const [oneOffEnd,setOneOffEnd]=useState(initialOpening.end);
+  const [oneOffSource,setOneOffSource]=useState<'cancellation'|'extra'>('cancellation');
   const [weekday,setWeekday]=useState(1);
   const [from,setFrom]=useState('09:00');
   const [to,setTo]=useState('12:00');
@@ -27,6 +34,7 @@ export default function InstructorDiary({instructor,demo,onAddWindow,onRemoveWin
 
   const windows=demo.weeklyWindows.filter(w=>w.instructorId===instructor.id);
   const blocks=demo.diaryBlocks.filter(b=>b.instructorId===instructor.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const openings=(demo.oneOffWindows??[]).filter(w=>w.instructorId===instructor.id).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
   const activeLessons=demo.lessons.filter(l=>l.instructorId===instructor.id && l.date===selectedDay && l.status!=='cancelled' && l.status!=='declined');
   const daySlots=slotsForDate(instructor.id,selectedDay,60,demo);
   const dates=Array.from({length:7},(_,i)=>isoDay(ukClock().date,offset*7+i));
@@ -50,8 +58,42 @@ export default function InstructorDiary({instructor,demo,onAddWindow,onRemoveWin
     onAddBlock({id:makeId(),instructorId:instructor.id,date:blockedDate,start,end,note:note.trim().slice(0,70)||'Unavailable'});
     setMessage('Time blocked in your demo diary.');
   }
+  function addOpening(){
+    setMessage('');
+    const clock=ukClock();
+    if(oneOffDate<clock.date || oneOffDate>isoDay(clock.date,90)||!validWindow(oneOffStart,oneOffEnd)){
+      setMessage('Choose a valid date within 90 days and a start before finish.');return;
+    }
+    const dayOffset=Math.round((Date.parse(oneOffDate+'T00:00:00Z')-Date.parse(clock.date+'T00:00:00Z'))/86400000);
+    if(dayOffset*1440+timeMinutes(oneOffStart)<clock.minutes+30){
+      setMessage('Please allow at least 30 minutes notice for a one-off opening.');return;
+    }
+    if(blocks.some(b=>b.date===oneOffDate&&timeMinutes(oneOffStart)<timeMinutes(b.end)&&timeMinutes(b.start)<timeMinutes(oneOffEnd))){
+      setMessage('This overlaps your blocked time off. Remove that block first.');return;
+    }
+    if(openings.some(o=>o.date===oneOffDate&&timeMinutes(oneOffStart)<timeMinutes(o.end)&&timeMinutes(o.start)<timeMinutes(oneOffEnd))){
+      setMessage('That overlaps another one-off opening. Remove or change it first.');return;
+    }
+    onAddOpening({id:makeId(),instructorId:instructor.id,date:oneOffDate,start:oneOffStart,end:oneOffEnd,source:oneOffSource});
+    setMessage('One-off opening added to your demo diary.');
+  }
   return <section className="diary-shell">
     <div className="diary-heading"><div><span className="eyebrow">INSTRUCTOR DIARY · DEMO</span><h2>Manage availability</h2><p>Set repeat working hours, block personal time and see the lessons already in your calendar.</p></div><span className="diary-timezone"><Clock3 size={15}/> Europe/London</span></div>
+    <div className="diary-card diary-oneoff">
+      <div className="diary-section-head"><Clock3 size={19}/><h3>Last-minute cancellations & one-off slots</h3></div>
+      <p className="diary-help">Offer a spare gap today or on a specific date without changing your usual weekly hours.</p>
+      <div className="live-oneoff-quick"><button type="button" onClick={()=>setOneOffDate(ukClock().date)}>Today</button><button type="button" onClick={()=>setOneOffDate(isoDay(ukClock().date,1))}>Tomorrow</button><button type="button" onClick={()=>{
+        const next=suggestedOpening();setOneOffDate(next.date);setOneOffStart(next.start);setOneOffEnd(next.end);
+      }}>Suggest next hour</button></div>
+      <div className="live-oneoff-fields">
+        <label>Reason<select value={oneOffSource} onChange={e=>setOneOffSource(e.target.value as 'cancellation'|'extra')}><option value="cancellation">Cancellation / gap opened up</option><option value="extra">Extra one-off time</option></select></label>
+        <label>Date<input type="date" min={ukClock().date} max={isoDay(ukClock().date,90)} value={oneOffDate} onChange={e=>setOneOffDate(e.target.value)}/></label>
+        <label>From<input type="time" value={oneOffStart} onChange={e=>setOneOffStart(e.target.value)}/></label>
+        <label>To<input type="time" value={oneOffEnd} onChange={e=>setOneOffEnd(e.target.value)}/></label>
+      </div><button type="button" className="live-oneoff-submit" onClick={addOpening}><Plus size={17}/> Add one-off opening</button>
+      <div className="live-opening-list-head"><h3>Upcoming one-off openings</h3><small>{openings.filter(w=>w.date>=ukClock().date).length} slots</small></div>
+      {openings.some(w=>w.date>=ukClock().date)?<div className="live-openings-list">{openings.filter(w=>w.date>=ukClock().date).map(w=><div key={w.id}><span className="live-oneoff-label">{w.source==='cancellation'?'Cancellation':'Extra slot'}</span><span className="live-oneoff-time"><strong>{formatDay(w.date)} · {w.start}–{w.end}</strong></span><button aria-label={'Delete one-off slot '+w.date} type="button" onClick={()=>onRemoveOpening(w.id)}><Trash2 size={17}/></button></div>)}</div>:<p className="diary-empty">No one-off openings yet.</p>}
+    </div>
     <div className="diary-columns">
       <div className="diary-card">
         <div className="diary-section-head"><CalendarDays size={19}/><h3>Weekly working hours</h3></div>
