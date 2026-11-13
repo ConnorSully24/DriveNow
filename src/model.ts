@@ -1,7 +1,7 @@
 export type Transmission = 'Manual' | 'Automatic';
 export type LessonStatus = 'requested' | 'confirmed' | 'arrived' | 'in_progress' | 'completed' | 'declined' | 'cancelled';
 export type Timing = 'ASAP' | 'Later today' | 'Choose a date';
-export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor' | 'signup' | 'schedule' | 'diary' | 'live-diary' | 'live-slots';
+export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor' | 'signup' | 'schedule' | 'diary' | 'live-diary' | 'live-slots' | 'alerts';
 export type BookingMode = 'now' | 'ahead' | 'block';
 export interface SlotSelection { date: string; time: string; duration: number; }
 export interface WeeklyWindow { id: string; instructorId: string; weekday: number; start: string; end: string; }

@@ -25,7 +25,9 @@ function createEmptyState(windows:WindowRow[],blocks:BlockRow[],openings:Opening
 const emptyState=createEmptyState([],[],[]);
 const maxDate=isoDay(ukClock().date,90);
 
-export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccount:()=>void}) {
+export default function LiveSchedule({view,onOpenAccount,onOpenAlerts,focusInstructorId,focusDate}:{
+  view:View;onOpenAccount:()=>void;onOpenAlerts?:()=>void;focusInstructorId?:string|null;focusDate?:string|null;
+}) {
   const [userId,setUserId]=useState<string|null>(null);
   const [sessionChecked,setSessionChecked]=useState(!supabase);
   const [listings,setListings]=useState<Listing[]>([]);
@@ -48,8 +50,8 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
   const [blockAllDay,setBlockAllDay]=useState(true);
   const [blockStart,setBlockStart]=useState('09:00');
   const [blockEnd,setBlockEnd]=useState('17:00');
-  const [selectedInstructor,setSelectedInstructor]=useState('');
-  const [date,setDate]=useState(ukClock().date);
+  const [selectedInstructor,setSelectedInstructor]=useState(focusInstructorId??'');
+  const [date,setDate]=useState(focusDate??ukClock().date);
   const [duration,setDuration]=useState(60);
   const [transmission,setTransmission]=useState<Transmission>('Manual');
   const [mode,setMode]=useState<'now'|'ahead'|'block'>('ahead');
@@ -271,6 +273,7 @@ export default function LiveSchedule({view,onOpenAccount}:{view:View;onOpenAccou
     </>}
 
     {view==='learner'&&<>
+      <div className="live-alerts-promo"><div><span className="eyebrow">DON'T MISS A CANCELLATION</span><strong><Bell size={19}/> Get automatic cancellation alerts</strong><p>Opt in to a private in-app inbox for last-minute cancellations. No bookings, payments, texts or push notifications.</p></div><button type="button" onClick={onOpenAlerts}>Manage alerts <ArrowRight size={17}/></button></div>
       <div className="live-card"><h2>Search published instructor test diaries</h2><div className="booking-mode-tabs" role="group" aria-label="Search type"><button type="button" className={mode==='now'?'active':''} onClick={()=>setMode('now')}>Book now preview</button><button type="button" className={mode==='ahead'?'active':''} onClick={()=>setMode('ahead')}>Book ahead preview</button><button type="button" className={mode==='block'?'active':''} onClick={()=>setMode('block')}>Block availability</button></div>
         <div className="live-search-fields"><label>Transmission<select value={transmission} onChange={e=>{setTransmission(e.target.value as Transmission);setCustomSlots([]);}}><option>Manual</option><option>Automatic</option></select></label><label>Instructor<select value={activeId} onChange={e=>{setSelectedInstructor(e.target.value);setCustomSlots([]);}} disabled={!visible.length}>{visible.length?visible.map(l=><option key={l.user_id} value={l.user_id}>{l.display_name}</option>):<option value="">No published test instructors</option>}</select></label><label>Duration<select value={duration} onChange={e=>{setDuration(Number(e.target.value));setCustomSlots([]);}}>{[60,90,120].map(min=><option value={min} key={min}>{min} minutes</option>)}</select></label>{mode!=='now'&&<label>Find on<input type="date" min={ukClock().date} max={maxDate} value={date} onChange={e=>setDate(e.target.value)}/></label>}</div>
         {mode==='block'&&<div className="live-search-fields"><label>Lessons<select value={count} onChange={e=>{setCount(Number(e.target.value));setCustomSlots([]);}}><option value={5}>5</option><option value={10}>10</option></select></label><label>Schedule pattern<select value={pattern} onChange={e=>{setPattern(e.target.value as 'weekly'|'custom');setCustomSlots([]);}}><option value="weekly">Same time each week</option><option value="custom">Pick individual dates</option></select></label></div>}

@@ -10,6 +10,8 @@ import LearnerAccount from './LearnerAccount';
 import BookingSchedule from './BookingSchedule';
 import InstructorDiary from './InstructorDiary';
 import LiveSchedule from './LiveSchedule';
+import CancellationAlerts from './CancellationAlerts';
+import { supabase } from './auth';
 import { formatDay, seriesAvailable } from './scheduling';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
@@ -123,6 +125,8 @@ function App() {
   const [toast, setToast] = useState('');
   const [clock, setClock] = useState(Date.now());
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadAlerts,setUnreadAlerts] = useState(0);
+  const [alertFocus,setAlertFocus] = useState<{instructorId:string;date:string}|null>(null);
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, number>>({});
   const [skillDrafts, setSkillDrafts] = useState<Record<string, number>>({});
 
@@ -136,6 +140,32 @@ function App() {
     const id = window.setTimeout(() => setToast(''), 4000);
     return () => window.clearTimeout(id);
   }, [toast]);
+
+  // Cross-page unread count, restricted to the current signed-in learner by RLS.
+  // Inbox notifications are DB-generated, but this badge refreshes only while
+  // DriveNow is open; this does not use OS push or email delivery.
+  useEffect(()=>{
+    const client=supabase;
+    if(!client)return;
+    let active=true;
+    async function loadUnread(){
+      if(!client)return;
+      try{
+        const {data:{user}}=await client.auth.getUser();
+        if(!active)return;
+        if(!user){setUnreadAlerts(0);return;}
+        const {count,error}=await client.from('cancellation_alerts').select('id',{count:'exact',head:true}).is('read_at',null);
+        if(active&&!error)setUnreadAlerts(count??0);
+      }catch{if(active)setUnreadAlerts(0);}
+    }
+    void loadUnread();
+    // Supabase recommends deferring API calls from auth callbacks.
+    const {data:{subscription}}=client.auth.onAuthStateChange(()=>{
+      window.setTimeout(()=>{if(active)void loadUnread();},0);
+    });
+    const interval=window.setInterval(()=>void loadUnread(),30000);
+    return()=>{active=false;subscription.unsubscribe();window.clearInterval(interval);};
+  },[]);
 
   const selected = INSTRUCTORS.find(i => i.id === selectedId) ?? INSTRUCTORS[0];
   const activeInstructor = INSTRUCTORS.find(i => i.id === instructorAccountId) ?? INSTRUCTORS[0];
@@ -231,6 +261,7 @@ function App() {
   const navItems: Array<{ key: Page; label: string; icon: LucideIcon; role: Role }> = [
     { key: 'home', label: 'Discover', icon: Home, role: 'learner' },
     { key: 'my-lessons', label: 'My lessons', icon: CalendarDays, role: 'learner' },
+    { key: 'alerts', label: 'Cancellation alerts', icon: Bell, role: 'learner' },
     { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'learner' },
     { key: 'signup', label: 'Account / Sign up', icon: UserRound, role: 'instructor' },
     { key: 'instructor', label: 'Dashboard', icon: Gauge, role: 'instructor' },
@@ -258,10 +289,11 @@ function App() {
         <button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setMenuOpen(true)}><Menu size={23}/></button>
         <div className="topbar-mobile-brand"><Brand/></div>
         <div className="topbar-breadcrumb">UK launch concept <ChevronRight size={14}/> {role === 'learner' ? 'Learner experience' : 'Instructor experience'}</div>
-        <div className="topbar-right">{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> {page==='live-diary'||page==='live-slots'?'LIVE DATA · TEST ONLY':'DEMO MODE'}</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('Demo bookings use browser storage. Supabase live schedules are read-only tests; paid bookings, licence checks and GPS are not connected.')}><CircleHelp size={19}/></button></div>
+        <div className="topbar-right"><button type="button" className="account-toplink alert-toplink" onClick={()=>{setRole('learner');setPage('alerts');}} aria-label={unreadAlerts>0?`Cancellation alerts, ${unreadAlerts} unread`:'Cancellation alerts'}><Bell size={17}/> Alerts{unreadAlerts>0&&<span className="alert-global-count">{unreadAlerts>99?'99+':unreadAlerts}</span>}</button>{<button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> {page==='live-diary'||page==='live-slots'||page==='alerts'?'LIVE DATA · TEST ONLY':'DEMO MODE'}</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('Demo bookings use browser storage. Supabase live schedules are read-only tests; paid bookings, licence checks and GPS are not connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
-        {page === 'live-slots' && <LiveSchedule view="learner" onOpenAccount={()=>setPage('signup')}/>}
+        {page === 'alerts' && <CancellationAlerts onBack={()=>setPage('live-slots')} onOpenAccount={()=>setPage('signup')} onViewAvailability={(instructorId,date)=>{setAlertFocus({instructorId,date});setPage('live-slots');}}/>}
+        {page === 'live-slots' && <LiveSchedule view="learner" onOpenAccount={()=>setPage('signup')} onOpenAlerts={()=>setPage('alerts')} focusInstructorId={alertFocus?.instructorId} focusDate={alertFocus?.date}/>}
         {page === 'live-diary' && <LiveSchedule view="instructor" onOpenAccount={()=>setPage('signup')}/>}
         {page === 'signup' && <LearnerAccount onBack={returnHome} onDemo={(demoRole, initialLearnerSkill) => { if (demoRole === 'learner' && initialLearnerSkill != null) setDemo(prev => ({...prev, learnerSelfSkill: initialLearnerSkill})); switchRole(demoRole); }} />}
         {role === 'learner' && page === 'home' && <>
