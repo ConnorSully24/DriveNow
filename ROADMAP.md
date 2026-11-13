@@ -73,6 +73,9 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 - [ ] Verify instructor sign-up and cross-device behaviour with two independently created test accounts.
 - [x] Implement authenticated single-test-lesson requests via restricted backend RPC, participant-only calendars and instructor accept/decline/cancel actions.
 - [x] Prevent overlapping pending/confirmed single test lessons atomically using a PostgreSQL exclusion constraint and 15-minute turnaround buffers; expose sanitised busy-slot data without learner PII.
+- [x] Reject overlapping test bookings for one learner across different instructors; cap pending future requests at eight per learner, and serialize time-off blocks against requests.
+- [x] Pass rollback-only SQL tests for booking acceptance, decline permissions, cancellation, slot release, cross-instructor overlaps and pending-request cap (no stored QA data).
+- [x] Add responsive seven-day learner and instructor test booking calendars, separate from the fictional browser demo.
 - [ ] Validate account-to-account acceptance, decline, cancellation and simultaneous bookings with independent test identities.
 - [ ] Build all-or-nothing multi-lesson block holds and a unified live learner booking journey; do not allow paid lessons until external checks.
 - [ ] Independently verify credentials before listing any instructor as approved or offering paid lessons.
