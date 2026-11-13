@@ -67,7 +67,9 @@ A UK marketplace for verified learner drivers and approved/licensed instructors 
 - [x] Add one-off cancellation/extra availability table with per-instructor write restrictions and published read rules.
 - [x] Add Today/Tomorrow/next-hour instructor shortcuts, remove control, and labelled last-minute availability in learner test search.
 - [x] Merge regular and one-off hours without duplicates; blockouts and minimum notice still apply.
-- [ ] Link cancellations to actual confirmed lessons, alert waiting learners and fill slots with transactional reservations (test only today).
+- [x] Deliver opt-in, matching cancellation watch preferences and private in-app inbox, with automatic server-side alert creation on newly posted or published cancellations.
+- [x] Add top-bar unread bell, per-user read controls and cross-device inbox polling.
+- [ ] Connect cancellations to actual confirmed lessons, add email/phone push delivery with permission and secure worker, and fill slots with transactional reservations.
 - [ ] Verify instructor sign-up and cross-device behaviour with two independently created test accounts.
 - [ ] Implement server-side holds and shared booking data before enabling even test reservations.
 - [ ] Independently verify credentials before listing any instructor as approved or offering paid lessons.
