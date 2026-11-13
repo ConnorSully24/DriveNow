@@ -10,7 +10,7 @@ type AccountRole = 'learner' | 'instructor';
 type InstructorRegistration = 'adi' | 'trainee' | 'ni';
 interface Props {
   onBack: () => void;
-  onDemo: (role: AccountRole) => void;
+  onDemo: (role: AccountRole, initialLearnerSkill?: number) => void;
 }
 
 type FormData = {
@@ -18,6 +18,7 @@ type FormData = {
   lastName: string;
   dob: string;
   postcode: string;
+  selfAssessedSkill: number | null;
   licenceIssuer: 'GB' | 'NI';
   hasProvisional: boolean;
   meetsEyesight: boolean;
@@ -32,7 +33,7 @@ type FormData = {
 };
 
 const EMPTY: FormData = {
-  firstName: '', lastName: '', dob: '', postcode: '', licenceIssuer: 'GB',
+  firstName: '', lastName: '', dob: '', postcode: '', selfAssessedSkill: null, licenceIssuer: 'GB',
   hasProvisional: false, meetsEyesight: false,
   instructorRegistration: 'adi', fullLicence3Years: false,
   insuredVehicle: false, transmission: 'Manual', email: '', password: '',
@@ -128,6 +129,7 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
         return;
       }
       if (!validPostcode(form.postcode)) { setError('Enter a valid UK postcode.'); return; }
+      if (role === 'learner' && (!Number.isInteger(form.selfAssessedSkill) || (form.selfAssessedSkill ?? 0) < 1 || (form.selfAssessedSkill ?? 11) > 10)) { setError('Choose your initial driving skill rating from 1 to 10.'); return; }
     }
     if (step === 2) {
       if (role === 'learner' && (!form.hasProvisional || !form.meetsEyesight)) {
@@ -167,6 +169,7 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
       if (role === 'learner' && (!form.hasProvisional || !form.meetsEyesight)) {
         setError('You must confirm your learner eligibility.'); return;
       }
+      if (role === 'learner' && (!Number.isInteger(form.selfAssessedSkill) || (form.selfAssessedSkill ?? 0) < 1 || (form.selfAssessedSkill ?? 11) > 10)) { setError('Choose a one-time skill rating from 1 to 10.'); return; }
       if (role === 'instructor' && (!form.fullLicence3Years || !form.insuredVehicle)) {
         setError('You must confirm your instructor eligibility.'); return;
       }
@@ -189,7 +192,8 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
               licence_issuer: form.licenceIssuer,
               ...(role === 'learner' ? {
                 provisional_declared: form.hasProvisional,
-                eyesight_declared: form.meetsEyesight
+                eyesight_declared: form.meetsEyesight,
+                 self_assessed_skill: form.selfAssessedSkill
               } : {
                 registration_type: form.instructorRegistration,
                 full_licence_three_years_declared: form.fullLicence3Years,
@@ -254,7 +258,7 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
   function startDemo(demoRole: AccountRole) {
     if (!DEMO_AVAILABLE) return;
     setError(''); setNotice('');
-    onDemo(demoRole);
+    onDemo(demoRole, demoRole === 'learner' ? form.selfAssessedSkill ?? 5 : undefined);
   }
 
   const labels = ['Account type', 'About you', role === 'learner' ? 'Provisional licence' : 'Instructor eligibility', 'Create login'];
@@ -325,6 +329,7 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
               <div className="account-two-fields"><label>First name<input autoComplete="given-name" maxLength={70} value={form.firstName} onChange={e => change('firstName', e.target.value)} placeholder="First name"/></label><label>Last name<input autoComplete="family-name" maxLength={70} value={form.lastName} onChange={e => change('lastName', e.target.value)} placeholder="Surname"/></label></div>
               <label>Date of birth<input type="date" autoComplete="bday" max={new Date().toISOString().slice(0,10)} value={form.dob} onChange={e => change('dob', e.target.value)}/></label>
               <label>UK postcode<input autoComplete="postal-code" maxLength={10} value={form.postcode} onChange={e => change('postcode', e.target.value)} placeholder="LS1 1AA"/></label>
+               {role === 'learner' && <fieldset className="skill-fieldset"><legend>Your driving skill today</legend><p>Rate yourself once at sign-up, from 1 (complete beginner) to 10 (very confident). After your first instructor assessment, the average of instructor scores replaces your estimate.</p><div className="skill-number-grid">{Array.from({length:10},(_,i)=>i+1).map(value=><button key={value} type="button" aria-pressed={form.selfAssessedSkill===value} className={form.selfAssessedSkill===value?'selected':''} onClick={()=>change('selfAssessedSkill',value)}>{value}</button>)}</div><small>1 = never driven · 5 = some experience · 10 = very confident</small></fieldset>
             </div>
             <div className="account-buttons"><button className="btn btn-secondary" onClick={() => setStep(0)}>Back</button><button className="btn btn-primary" onClick={next}>Continue <ArrowRight size={18}/></button></div>
           </>}
@@ -360,7 +365,8 @@ export default function LearnerAccount({ onBack, onDemo }: Props) {
           <button className="account-text-button" onClick={() => { setMode('signin'); setError(''); setNotice(''); }}>Already have an account? Sign in</button>
         </>}
         {DEMO_AVAILABLE && <div className="account-demo-panel"><span className="account-demo-pill">TEST MODE · NO DETAILS NEEDED</span><h3>Skip sign-up and try the app</h3><p>No personal details or passwords needed. Demo accounts are simulated, and cannot book or offer real lessons.</p>
-          <div className="account-demo-actions"><button type="button" onClick={() => startDemo('learner')}><GraduationCap size={18}/> Try learner demo <ArrowRight size={15}/></button><button type="button" onClick={() => startDemo('instructor')}><CarFront size={18}/> Try instructor demo <ArrowRight size={15}/></button></div>
+          <label className="demo-skill-picker">Starting learner skill (optional for demo)<select value={form.selfAssessedSkill ?? 5} onChange={e=>change('selfAssessedSkill',Number(e.target.value))}>{Array.from({length:10},(_,i)=>i+1).map(value=><option key={value} value={value}>{value} / 10</option>)}</select></label>
+           <div className="account-demo-actions"><button type="button" onClick={() => startDemo('learner')}><GraduationCap size={18}/> Try learner demo <ArrowRight size={15}/></button><button type="button" onClick={() => startDemo('instructor')}><CarFront size={18}/> Try instructor demo <ArrowRight size={15}/></button></div>
         </div>}
       </div>
       <aside className="account-aside"><span className="account-aside-icon"><BadgeCheck size={27}/></span><h3>Two ways to drive forward</h3><p><strong>Learners</strong> find lessons after secure identity and provisional licence checks. <strong>Instructors</strong> list available slots after approved instructor and insurance checks.</p><div className="account-aside-item"><ShieldCheck size={18}/><span>Independent licence and eligibility checks</span></div><div className="account-aside-item"><Mail size={18}/><span>Verified email for real accounts</span></div><a href="https://www.gov.uk/government/publications/whats-involved-in-being-a-driving-instructor/approved-driving-instructor-adi-register-guide" target="_blank" rel="noopener noreferrer">UK instructor regulations <ExternalLink size={15}/></a></aside>
