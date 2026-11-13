@@ -135,3 +135,48 @@
 .diary-caveat{display:flex;align-items:flex-start;gap:10px;color:#8c8096;font-size:.72rem;line-height:1.55;margin:21px 0 0}
 @media(max-width:1100px){.booking-discovery-grid{grid-template-columns:1fr}.booking-summary-card{position:static}.diary-columns{grid-template-columns:1fr}.diary-calendar-slots{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:700px){.booking-entry-grid{grid-template-columns:1fr;gap:9px}.booking-entry-grid button{grid-template-columns:auto 1fr auto;padding:14px;gap:4px 12px}.booking-entry-grid button>svg:first-child{grid-column:1;grid-row:1/3;padding:10px}.booking-entry-grid button strong{grid-column:2;grid-row:1}.booking-entry-grid button span{grid-column:2;grid-row:2}.booking-entry-grid button>svg:last-child{grid-column:3;grid-row:1/3}.booking-mode-tabs{gap:5px}.booking-mode-tabs button{flex:1;padding:11px 5px;gap:5px;font-size:.72rem;min-width:0}.booking-search-card,.booking-summary-card,.diary-card{padding:16px}.booking-fields{grid-template-columns:1fr 1fr}.booking-fields label:first-child{grid-column:1/-1}.booking-slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.booking-block-options{grid-template-columns:1fr}.diary-timezone{font-size:.62rem}.diary-date-strip{gap:4px;overflow-x:auto;grid-template-columns:repeat(7,minmax(67px,1fr))}.diary-calendar-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.diary-booked-list{grid-template-columns:1fr}.diary-weekday{grid-template-columns:75px 1fr}}
+
+/* Live Supabase availability test: distinct from the fictional bookings demo. */
+.live-panel{max-width:1200px;margin:0 auto;display:grid;gap:19px}
+.live-head{display:flex;align-items:flex-start;justify-content:space-between;gap:17px}
+.live-head h1{font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:-.04em;margin:9px 0}
+.live-head p{color:#84788e;font-size:.85rem;line-height:1.55;margin:0;max-width:700px}
+.live-refresh{display:inline-flex;gap:7px;align-items:center;background:white;border:1px solid #e3d8f0;border-radius:10px;padding:10px 15px;color:#60468e;font-size:.78rem;font-weight:800;white-space:nowrap}
+.live-refresh:disabled{opacity:.6}
+.live-warning{display:flex;gap:13px;align-items:flex-start;border:1px solid #f5e0b1;background:#fffbf2;color:#806128;padding:15px 18px;border-radius:12px;font-size:.81rem;line-height:1.55}
+.live-warning svg{flex:none;margin-top:1px}
+.live-warning strong{color:#74501e}
+.live-card{border:1px solid #e6dfef;background:#fff;border-radius:17px;box-shadow:0 6px 20px #2010400a;padding:23px;min-width:0}
+.live-card h2{font-size:1.02rem;letter-spacing:-.02em;color:#322c3d;margin:0 0 9px;display:flex;align-items:center;gap:9px}
+.live-card h3{font-size:.84rem;margin:20px 0 10px}
+.live-card p{color:#7f738a;line-height:1.55;font-size:.8rem;margin:0 0 15px}
+.live-two-col{display:grid;grid-template-columns:1fr 1fr;gap:17px;align-items:start}
+.live-publish{display:flex;align-items:center;justify-content:space-between;gap:25px;background:linear-gradient(130deg,#fff,#f9f5ff)}
+.live-publish p{margin:6px 0}
+.live-publish small{font-size:.72rem;color:#84758d}
+.live-toggle{display:flex;gap:11px;align-items:center;justify-content:center;white-space:nowrap;background:#f1eaff;border:1px solid #e8dcfa;color:#61418e;padding:12px 15px;border-radius:12px;font-size:.77rem;font-weight:800}
+.live-toggle input{accent-color:#7844d9;width:19px;height:19px}
+.live-search-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:15px 0}
+.live-search-fields label{display:flex;flex-direction:column;gap:8px;font-size:.73rem;font-weight:800;color:#61546f;min-width:0}
+.live-search-fields select,.live-search-fields input{min-width:0;width:100%;background:#fff;color:#372a45;border:1px solid #e5ddea;border-radius:10px;min-height:44px;padding:10px}
+.live-slot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.live-available-option,.live-slot-choice{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0;padding:14px;background:#f6f1ff;border:1px solid #e6d9fd;color:#5a398e;border-radius:11px;font-size:.77rem;line-height:1.35}
+.live-available-option>strong{font-size:.99rem}
+.live-available-option small,.live-slot-choice small{font-size:.7rem;color:#837097;overflow-wrap:anywhere}
+.live-slot-choice{cursor:pointer;align-items:center;font-weight:800}
+.live-slot-choice.selected{background:#7740d1;color:#fff;border-color:#7740d1}
+.live-slot-choice.selected small{color:#f3eaff}
+.live-result-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.live-result-header h2{margin:7px 0}
+.live-result-header p{margin:0}
+.live-nobook{display:inline-block;border:1px solid #edcbd3;color:#9b4c62;background:#fff3f4;border-radius:99px;padding:8px 12px;white-space:nowrap;font-size:.69rem;font-weight:800}
+.live-selected{border-top:1px solid #ece5f2;margin-top:17px;padding-top:12px}
+.live-selected>div{display:flex;gap:7px;flex-wrap:wrap}
+.live-selected>div span{padding:7px 9px;background:#f1eaff;color:#6543a0;border-radius:7px;font-size:.7rem}
+.open-diary-secondary{background:white;color:#634193;border:1px solid #dcd0f1;margin-top:-12px}
+.live-explore-callout{display:flex;justify-content:space-between;align-items:center;gap:16px;background:#f4edff;border:1px solid #dcccff;border-radius:14px;padding:18px 20px;margin:0 0 22px}
+.live-explore-callout strong{display:block;font-size:1.01rem;color:#51327c;margin:7px 0 3px}
+.live-explore-callout p{font-size:.77rem;color:#86749e;margin:0}
+.live-explore-callout button{border:1px solid #7544cd;background:#7544cd;color:#fff;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 14px;border-radius:9px;font-size:.77rem;font-weight:800}
+@media(max-width:1050px){.live-two-col{grid-template-columns:1fr}.live-search-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.live-slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.live-head,.live-publish,.live-explore-callout{flex-direction:column;align-items:stretch}.live-panel{gap:13px}.live-card{padding:17px}.live-search-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.live-slot-grid{grid-template-columns:1fr}.live-result-header{flex-direction:column}.live-toggle{white-space:normal}.live-explore-callout button,.live-refresh{align-self:flex-start}.live-warning{font-size:.75rem}}
