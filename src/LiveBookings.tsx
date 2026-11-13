@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, CalendarDays, Check, Clock3, RefreshCw, ShieldAlert, UserRound, X } from 'lucide-react';
 import { supabase } from './auth';
-import { formatDay, ukClock } from './scheduling';
+import { formatDay } from './scheduling';
 
 export type TestBooking = {
   id:string;learner_id:string;instructor_id:string;
