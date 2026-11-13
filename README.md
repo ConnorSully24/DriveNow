@@ -1,3 +1,21 @@
+## Learner onboarding (November 2026)
+
+The **Learner account** screens now include a three-step UK learner sign-up flow: legal name / DOB / postcode, provisional-licence and eyesight declarations, and email/password account creation. Age 17+ is enforced for the initial pilot, with an explicit note that age-16 mobility exceptions need a separate manual review pathway. A sign-in view and read-only licence-verification status are also provided.
+
+**Important:** This is not yet a live licence checking system. The DVLA's share-code service uses a code and the last eight characters of a licence number; DriveNow does NOT collect these in the frontend. Never ask users to email or upload licence photos before you have a trusted verification provider, a privacy policy and secure server-side storage. Accounts must NEVER be marked verified based on self-declarations or a user's browser. The current booking experience is an independent demo that needs server-side verification gating before launch.
+
+### Connecting real sign-ups
+
+1. Create a Supabase project and review UK data protection, children's privacy, security and retention requirements before processing real learner data.
+2. In the Supabase **SQL Editor**, review and run `supabase-schema.sql`. This creates user-owned profile tables, a read-only `learner_verifications` table and an auth trigger. Only a trusted backend can assign `verified`.
+3. In Supabase **Authentication**, enable email confirmations. Configure the Site URL and redirect allowlist for your deployment (GitHub Pages or Render). For the pilot, configure signup rate limits/CAPTCHA and abuse protection.
+4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the Supabase project's **public** credentials in the Render build environment or GitHub Actions **build-time** variables. **Never use a service-role key, database password, Stripe secret, or private credential in a `VITE_` variable.** The GitHub Actions workflow will need these two public values explicitly in the Build step when enabled.
+5. Implement the server-side licence check (provider/manual review with authorised DVLA access), privacy notice, authenticated account deletion, admin review and server-side booking eligibility checks. Do not launch paid bookings until those work.
+
+Without env configuration, the account screens can be previewed and navigated; clicking create account never sends data or falsely claims account creation.
+
+---
+
 # DriveNow – on-demand driving lesson prototype
 
 A polished, responsive UK driving lesson marketplace concept. Built as a **frontend-only demo** using React, TypeScript and Vite. Installable as a Progressive Web App (PWA) when hosted over HTTPS.

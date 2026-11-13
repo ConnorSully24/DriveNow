@@ -1,7 +1,7 @@
 export type Transmission = 'Manual' | 'Automatic';
 export type LessonStatus = 'requested' | 'confirmed' | 'arrived' | 'in_progress' | 'completed' | 'declined' | 'cancelled';
 export type Timing = 'ASAP' | 'Later today' | 'Choose a date';
-export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor';
+export type Page = 'home' | 'details' | 'instructors' | 'checkout' | 'lesson' | 'my-lessons' | 'instructor' | 'signup';
 
 export interface Instructor {
   id: string;

@@ -6,6 +6,7 @@ import {
   SlidersHorizontal, Sparkles, Star, Gauge as SteeringWheel, Timer, UserRound, Wallet, X,
   Zap, type LucideIcon
 } from 'lucide-react';
+import LearnerAccount from './LearnerAccount';
 import {
   DEFAULT_PREFS, INSTRUCTORS, INITIAL_STATE, STATE_KEY, formatGBP, loadDemoState,
   prettyDate, prettyStatus, type DemoState, type Instructor, type Lesson,
@@ -192,6 +193,7 @@ function App() {
   const navItems: Array<{ key: Page; label: string; icon: LucideIcon; role: Role }> = [
     { key: 'home', label: 'Discover', icon: Home, role: 'learner' },
     { key: 'my-lessons', label: 'My lessons', icon: CalendarDays, role: 'learner' },
+    { key: 'signup', label: 'Learner account', icon: UserRound, role: 'learner' },
     { key: 'instructor', label: 'Dashboard', icon: Gauge, role: 'instructor' }
   ];
 
@@ -214,9 +216,10 @@ function App() {
         <button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setMenuOpen(true)}><Menu size={23}/></button>
         <div className="topbar-mobile-brand"><Brand/></div>
         <div className="topbar-breadcrumb">UK launch concept <ChevronRight size={14}/> {role === 'learner' ? 'Learner experience' : 'Instructor experience'}</div>
-        <div className="topbar-right"><span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
+        <div className="topbar-right">{role === 'learner' && <button className="account-toplink" onClick={() => setPage('signup')}><UserRound size={17}/> Sign in / Sign up</button>}<span className="demo-chip"><span/> DEMO MODE</span><button className="icon-button help-button" title="Prototype only — no real bookings or charges" onClick={() => setToast('This is a locally saved prototype. No real instructors, payments, or GPS are connected.')}><CircleHelp size={19}/></button></div>
       </header>
       <main className="content">
+        {role === 'learner' && page === 'signup' && <LearnerAccount onBack={() => setPage('home')} />}
         {role === 'learner' && page === 'home' && <>
           <section className="hero">
             <div className="hero-copy"><span className="hero-kicker"><Zap size={15} fill="currentColor"/> YOUR NEXT LESSON, SORTED</span>
@@ -239,6 +242,7 @@ function App() {
               <div className="how-step"><div>03</div><span><strong>Get on the road</strong><small>Send a request and track its progress.</small></span></div>
             </section>
           </div>
+          <div className="account-cta"><div><strong>New to driving? Create your learner account</strong><p>Prepare for ID and provisional licence checks before real bookings go live.</p></div><Button variant="secondary" icon={ArrowRight} onClick={() => setPage('signup')}>Get started</Button></div>
           {lessonCount > 0 && <section className="existing-bookings"><div className="heading-row"><h2>Your recent lessons</h2><button className="text-action" onClick={() => setPage('my-lessons')}>View all <ArrowRight size={16}/></button></div><div className="lesson-list">{demo.lessons.slice(0,2).map(l => <LessonTile key={l.id} lesson={l} onOpen={() => openLessonPage(l.id)}/>)}</div></section>}
         </>}
 
@@ -274,7 +278,7 @@ function App() {
             <h2 className="subheading">Lesson details</h2><div className="detail-rows"><div><IconLabel icon={MapPin}>Pick-up</IconLabel><strong>{prefs.location}</strong></div><div><IconLabel icon={Clock3}>Time</IconLabel><strong>{prefs.timing === 'ASAP' ? 'As soon as possible' : prefs.timing === 'Later today' ? `Today at ${prefs.time}` : `${prettyDate(prefs.date)} at ${prefs.time}`}</strong></div><div><IconLabel icon={Timer}>Duration</IconLabel><strong>{prefs.duration} minutes</strong></div><div><IconLabel icon={CarFront}>Transmission</IconLabel><strong>{prefs.transmission}</strong></div></div>
             <div className="total-row"><div><strong>Demo total</strong><small>Example price · no money taken</small></div><strong>{formatGBP(amount)}</strong></div>
             <Button icon={ArrowRight} className="full" onClick={createBooking}>Send demo lesson request</Button>
-            <p className="secure-note"><ShieldCheck size={16}/> No account or card needed for this prototype.</p></section>
+            <p className="secure-note"><ShieldCheck size={16}/> Demo only — real bookings will require a verified provisional licence and an account.</p><button className="account-text-button" onClick={() => setPage('signup')}>Start learner verification <ArrowRight size={16}/></button></section>
             <aside className="aside-stack"><div className="aside-callout"><CreditCard size={26}/><h3>Payments come later.</h3><p>We’ll add secure payments once the marketplace works with actual instructors. This screen simulates checkout only.</p></div><div className="info-card"><Bell size={20}/><div><strong>What happens next?</strong><p>Switch to Instructor view to accept the request, then return to Learner view to see the status update.</p></div></div></aside>
           </div>
         </>}
@@ -314,7 +318,7 @@ function App() {
       </main>
       <footer className="footer"><span>© {new Date().getFullYear()} DriveNow concept</span><span>Prototype only · No real bookings or charges</span></footer>
     </div>
-    <nav className="mobile-bottom" aria-label="Mobile navigation"><button className={role==='learner' && page==='home' ? 'active' : ''} onClick={() => {switchRole('learner');setPage('home');}}><Home size={21}/><span>Discover</span></button><button className={role==='learner' && page==='my-lessons' ? 'active' : ''} onClick={() => {setRole('learner');setPage('my-lessons');}}><CalendarDays size={21}/><span>Lessons</span></button><button className={role==='instructor' ? 'active' : ''} onClick={() => switchRole('instructor')}><SteeringWheel size={21}/><span>Instructor</span></button></nav>
+    <nav className="mobile-bottom" aria-label="Mobile navigation"><button className={role==='learner' && page==='home' ? 'active' : ''} onClick={() => {switchRole('learner');setPage('home');}}><Home size={21}/><span>Discover</span></button><button className={role==='learner' && page==='my-lessons' ? 'active' : ''} onClick={() => {setRole('learner');setPage('my-lessons');}}><CalendarDays size={21}/><span>Lessons</span></button><button className={role==='learner' && page==='signup' ? 'active' : ''} onClick={() => { setRole('learner'); setPage('signup'); }}><UserRound size={21}/><span>Account</span></button><button className={role==='instructor' ? 'active' : ''} onClick={() => switchRole('instructor')}><SteeringWheel size={21}/><span>Instructor</span></button></nav>
     {menuOpen && <button className="sidebar-overlay" aria-label="Close sidebar" onClick={() => setMenuOpen(false)} />}
     {toast && <div className="toast" role="status"><CheckCircle2 size={18}/>{toast}<button aria-label="Dismiss notice" onClick={() => setToast('')}><X size={15}/></button></div>}
   </div>;
