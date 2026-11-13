@@ -32,3 +32,106 @@
 
 /* One-time learner signup estimate and mutual post-lesson feedback */
 .skill-fieldset{border:1px solid #e8ddfa;border-radius:13px;padding:17px;margin:12px 0 4px;background:#fcfaff}.skill-fieldset legend{font-weight:800;color:#503879;padding:0 6px}.skill-fieldset p,.feedback-panel p,.instructor-feedback-item p,.feedback-explainer{font-size:.78rem;line-height:1.55;color:#7d718d;margin:6px 0 13px}.skill-fieldset small{display:block;margin-top:9px;color:#726782}.skill-number-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin:11px 0}.skill-number-grid button{padding:10px 0;background:#f5f0fb;border:1px solid #e4d9f6;border-radius:8px;font-size:.82rem;font-weight:800;color:#694a91;min-width:0}.skill-number-grid button.selected,.skill-number-grid button[aria-pressed=true]{background:#7543dc;border-color:#7543dc;color:#fff}.skill-number-grid button:focus-visible,.review-stars button:focus-visible{outline:3px solid #a889ff;outline-offset:2px}.demo-skill-picker{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.78rem;margin:12px 0}.demo-skill-picker select{max-width:105px;border:1px solid #d7cde5;border-radius:8px;padding:8px;background:white}.skill-summary-card{display:flex;align-items:center;justify-content:space-between;gap:18px;border-radius:14px;border:1px solid #e4daf9;background:linear-gradient(100deg,#f7f1ff,#fff);padding:17px 20px;margin:15px 0}.skill-summary-card svg{color:#7f4edf}.skill-summary-card h3{font-size:1.45rem;color:#4b2c82;margin:4px 0 2px}.skill-summary-card p{font-size:.77rem;color:#716280;margin:0;line-height:1.55}.feedback-alert{display:flex;gap:9px;align-items:center;border:1px solid #f5da9e;background:#fff8e9;color:#775115;border-radius:12px;padding:13px 16px;text-align:left;margin:12px 0;width:100%;font-weight:750;font-size:.8rem}.feedback-alert svg:last-child{margin-left:auto}.feedback-panel{margin:19px 0;border:1px solid #e2d5fb;background:#faf8ff;border-radius:14px;padding:18px}.feedback-panel h3{display:flex;gap:8px;align-items:center;color:#533585;margin:0}.feedback-panel .btn,.instructor-feedback-item .btn{margin-top:11px}.review-stars{display:flex;gap:7px;margin:10px 0}.review-stars button{display:grid;place-items:center;background:#fff;border:1px solid #eedcae;border-radius:9px;padding:9px}.review-stars button[aria-pressed=true]{background:#ffefc3}.feedback-saved{display:flex;align-items:center;gap:8px;margin-top:10px;color:#277b55;font-size:.8rem;font-weight:800}.feedback-list{margin:22px 0}.instructor-feedback-item{border:1px solid #e8ddfa;background:#fcfaff;border-radius:12px;padding:16px;margin:11px 0}.instructor-feedback-item>strong{color:#453265}.instructor-feedback-item>p{margin:7px 0}@media(max-width:600px){.skill-number-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.skill-number-grid button{padding:12px 0}.skill-summary-card{padding:14px}.feedback-panel{padding:14px}}
+
+/* DriveNow scheduling milestone: shared learner discovery + instructor diary */
+.booking-entry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:18px 0 24px}
+.booking-entry-grid button{min-width:0;display:grid;grid-template-columns:1fr auto;gap:9px;text-align:left;align-items:center;background:#fff;border:1px solid #e9e3f2;box-shadow:0 7px 22px #25164a09;border-radius:15px;padding:22px;color:#7042d0;transition:transform .15s,border-color .15s,box-shadow .15s}
+.booking-entry-grid button:hover{border-color:#bca4f3;box-shadow:0 8px 25px #4b2d971d;transform:translateY(-2px)}
+.booking-entry-grid button>svg:first-child{grid-column:1/-1;background:#f1eaff;box-sizing:content-box;padding:11px;border-radius:12px}
+.booking-entry-grid button strong{font-size:1rem;grid-column:1;letter-spacing:-.02em;color:#272039}
+.booking-entry-grid button span{font-size:.76rem;grid-column:1/-1;color:#81778b;line-height:1.35}
+.booking-entry-grid button>svg:last-child{grid-column:2;grid-row:2;align-self:center}
+.booking-schedule{max-width:1190px;margin:0 auto}
+.booking-schedule>.eyebrow{display:block;margin:13px 0 6px}
+.booking-schedule>h1{margin:0 0 6px}
+.booking-schedule-intro{font-size:.88rem;color:#7e738f;max-width:720px}
+.booking-mode-tabs{display:flex;gap:9px;margin:20px 0 22px;flex-wrap:wrap}
+.booking-mode-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #e6def0;background:white;border-radius:10px;padding:13px 20px;font-weight:800;color:#655777}
+.booking-mode-tabs button.active{color:white;background:#7041d1;border-color:#7041d1}
+.booking-discovery-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.8fr);gap:19px;align-items:start}
+.booking-search-card,.booking-summary-card,.diary-card{background:white;border:1px solid #e9e2f1;border-radius:18px;padding:24px;box-shadow:0 7px 25px #1a123b07}
+.booking-search-card h2,.booking-summary-card h2{font-size:1.12rem;margin:0 0 19px}
+.booking-fields{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:13px}
+.booking-fields label,.booking-select-instructor,.booking-date-label,.booking-block-options label,.diary-add-form label,.diary-block-form label{font-size:.73rem;font-weight:800;color:#5c536c;display:flex;flex-direction:column;gap:7px}
+.booking-fields label>svg{display:none}
+.booking-fields input,.booking-fields select,.booking-select-instructor select,.booking-date-label input,.booking-block-options select,.diary-add-form input,.diary-add-form select,.diary-block-form input{width:100%;min-width:0;border:1px solid #e4ddec;border-radius:10px;background:#fff;padding:11px;color:#332b42;min-height:43px}
+.booking-fields input:focus,.booking-fields select:focus,.booking-select-instructor select:focus{border-color:#8150db}
+.booking-select-instructor,.booking-date-label{margin:15px 0}
+.booking-block-options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.booking-available-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:22px 0 13px}
+.booking-available-heading h3{font-size:.95rem;margin:0}
+.booking-available-heading span{font-weight:800;font-size:.72rem;background:#f3ebff;color:#7546c5;border-radius:999px;padding:6px 10px}
+.booking-slot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.booking-slot-grid button{display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center;min-width:0;min-height:64px;padding:11px 7px;border:1px solid #dfd6eb;border-radius:10px;background:#fbf9ff;color:#4b386c;font-weight:800;transition:border-color .15s,background .15s}
+.booking-slot-grid button small{font-size:.67rem;color:#81718e;font-weight:600;line-height:1.3;text-align:center}
+.booking-slot-grid button.selected,.booking-slot-grid button[aria-pressed=true]{background:#7444d7;border-color:#7444d7;color:#fff}
+.booking-slot-grid button.selected small{color:#eee2ff}
+.booking-empty,.booking-no-selection{color:#83778f;border:1px dashed #ddcfea;background:#fcfaff;border-radius:12px;padding:17px;font-size:.79rem;line-height:1.55}
+.booking-helper,.booking-small-print{color:#7b718a;font-size:.76rem;line-height:1.6}
+.booking-error{color:#a2393b;background:#fff0f0;border-radius:9px;padding:11px 14px;font-size:.78rem;font-weight:700}
+.booking-summary-card{position:sticky;top:18px;background:linear-gradient(180deg,#fff,#fbf9ff)}
+.booking-summary-card>p{font-size:.77rem;color:#72667f;margin:9px 0}
+.booking-summary-card h2{margin-top:9px}
+.booking-selection-list{display:grid;gap:7px;max-height:335px;overflow:auto;margin:18px 0;padding-right:2px}
+.booking-selection-list>div:not(.booking-no-selection),.checkout-series>div{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #eae2f1;background:#fff;border-radius:10px;padding:11px}
+.booking-selection-list strong{font-size:.78rem;color:#392c4d}
+.booking-selection-list small{display:block;font-size:.72rem;color:#83758e;margin-top:4px}
+.booking-total{border-top:1px solid #e7def0;padding:18px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.booking-total span{font-size:.77rem;color:#6c6080}
+.booking-total strong{font-size:1.36rem;color:#54318a}
+.booking-continue{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:11px;background:#7341d8;color:#fff;font-weight:800}
+.booking-continue:disabled{opacity:.48}
+.booking-safety{display:flex;gap:9px;align-items:flex-start;font-size:.69rem!important;line-height:1.5;color:#897f96!important;margin-top:15px!important}
+.checkout-series{display:grid;gap:7px;margin:9px 0 17px}
+.checkout-series>div{font-size:.8rem}
+.checkout-series strong{color:#604397}
+.open-diary-button{display:flex;align-items:center;gap:11px;background:#7041d3;color:#fff;padding:14px 19px;font-weight:800;border-radius:11px;margin:18px 0 23px}
+.open-diary-button svg:last-child{margin-left:auto}
+.diary-shell{display:grid;gap:18px}
+.diary-heading{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.diary-heading h2{font-size:1.38rem;margin:7px 0}
+.diary-heading p{color:#81748f;font-size:.78rem;line-height:1.55;margin:0}
+.diary-timezone{display:flex;align-items:center;gap:6px;white-space:nowrap;color:#74559b;background:#f3edff;border-radius:999px;padding:9px 12px;font-size:.72rem;font-weight:800}
+.diary-columns{display:grid;grid-template-columns:1fr 1fr;gap:17px;align-items:start}
+.diary-section-head{display:flex;align-items:center;gap:9px;color:#7650b8;margin-bottom:10px}
+.diary-section-head h3{font-size:1rem;margin:0;flex:1;color:#392e50}
+.diary-help{font-size:.77rem;color:#81758f;line-height:1.55;margin:0 0 19px}
+.diary-weekly-list{display:grid;gap:8px}
+.diary-weekday{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid #f0ecf4}
+.diary-weekday>strong{font-size:.76rem;padding-top:6px;color:#4c4160}
+.diary-weekday>div{display:flex;gap:7px;flex-wrap:wrap}
+.diary-window{display:inline-flex;align-items:center;gap:6px;background:#f1eaff;color:#6944ae;border-radius:8px;padding:6px 6px 6px 9px;font-size:.72rem;font-weight:800}
+.diary-window button,.diary-block-list button,.diary-week-nav button{display:grid;place-items:center;background:transparent;color:inherit;border-radius:7px;padding:3px}
+.diary-window button:hover,.diary-block-list button:hover{background:#eadcff}
+.diary-dayoff{font-size:.72rem;color:#9b91a6;padding:6px}
+.diary-add-form{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;margin-top:19px}
+.diary-add-form>button,.diary-block-form>button{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid #cab1f5;background:#f1eaff;color:#6132b3;border-radius:10px;padding:11px;font-weight:800;font-size:.77rem}
+.diary-block-form{display:grid;gap:13px}
+.diary-inline-check{display:flex!important;flex-direction:row!important;align-items:center;gap:10px}
+.diary-inline-check input{width:auto!important;min-height:0}
+.diary-timepair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.diary-block-form~h4,.diary-calendar h4{margin:23px 0 12px;font-size:.82rem;color:#423453}
+.diary-block-list{display:grid;gap:8px;max-height:260px;overflow-y:auto}
+.diary-block-list>div,.diary-booked-list>div{border:1px solid #e9e1f1;border-radius:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px}
+.diary-block-list strong,.diary-booked-list strong{font-size:.77rem}
+.diary-block-list small{display:block;font-size:.7rem;color:#8c809c;margin-top:3px}
+.diary-block-list button{color:#a15b70}
+.diary-empty{font-size:.76rem;color:#9c8caa;padding:10px 0}
+.diary-feedback{background:#f7f0ff;border-radius:10px;padding:13px;color:#603c98;font-size:.77rem}
+.diary-week-nav{display:flex;gap:4px;margin-left:auto}
+.diary-week-nav button{background:#f6f1fa;padding:6px}
+.diary-week-nav button:disabled{opacity:.35}
+.diary-date-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+.diary-date-strip button{min-width:0;display:flex;flex-direction:column;gap:6px;border-radius:9px;background:#f7f3fb;border:1px solid #ebdfef;color:#5e4c75;padding:11px 4px;font-weight:800;font-size:.71rem}
+.diary-date-strip button small{font-size:.61rem;font-weight:500;color:#897c96}
+.diary-date-strip button.selected{background:#7040d3;border-color:#7040d3;color:white}
+.diary-date-strip button.selected small{color:#e5d8ff}
+.diary-calendar-slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.diary-free-slot{display:flex;justify-content:space-between;gap:5px;align-items:center;flex-wrap:wrap;background:#ecf8f0;border:1px solid #d6efdc;color:#397e53;border-radius:9px;padding:11px;font-size:.78rem;font-weight:800}
+.diary-free-slot small{font-size:.67rem;font-weight:600}
+.diary-booked-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.diary-booked-list>div{display:flex;align-items:flex-start;flex-direction:column;background:#fff7ee;color:#845a20}
+.diary-booked-list span{font-size:.72rem}
+.diary-caveat{display:flex;align-items:flex-start;gap:10px;color:#8c8096;font-size:.72rem;line-height:1.55;margin:21px 0 0}
+@media(max-width:1100px){.booking-discovery-grid{grid-template-columns:1fr}.booking-summary-card{position:static}.diary-columns{grid-template-columns:1fr}.diary-calendar-slots{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:700px){.booking-entry-grid{grid-template-columns:1fr;gap:9px}.booking-entry-grid button{grid-template-columns:auto 1fr auto;padding:14px;gap:4px 12px}.booking-entry-grid button>svg:first-child{grid-column:1;grid-row:1/3;padding:10px}.booking-entry-grid button strong{grid-column:2;grid-row:1}.booking-entry-grid button span{grid-column:2;grid-row:2}.booking-entry-grid button>svg:last-child{grid-column:3;grid-row:1/3}.booking-mode-tabs{gap:5px}.booking-mode-tabs button{flex:1;padding:11px 5px;gap:5px;font-size:.72rem;min-width:0}.booking-search-card,.booking-summary-card,.diary-card{padding:16px}.booking-fields{grid-template-columns:1fr 1fr}.booking-fields label:first-child{grid-column:1/-1}.booking-slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.booking-block-options{grid-template-columns:1fr}.diary-timezone{font-size:.62rem}.diary-date-strip{gap:4px;overflow-x:auto;grid-template-columns:repeat(7,minmax(67px,1fr))}.diary-calendar-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.diary-booked-list{grid-template-columns:1fr}.diary-weekday{grid-template-columns:75px 1fr}}
