@@ -8,7 +8,7 @@ For usability testing, either account can be explored instantly with **Skip sign
 
 1. Create a Supabase project, enable Email authentication and **Confirm email** (use test addresses initially). Configure the hosted Site URL and redirect URLs.
 2. Review and run `supabase-schema.sql` in the SQL Editor. This sets up **learner and instructor** profile and verification tables; signup triggers create role-specific profiles and cannot mark people verified.
-3. Add the public `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the **build-time** environment on your hosting provider. For GitHub Pages, pass them as GitHub Actions repository variables, not a private database password. Never expose a service-role or secret key in frontend code.
+3. Add the public `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`) to the **build-time** environment on your hosting provider. For GitHub Pages, add these values under **Repository Settings > Secrets and variables > Actions > Variables**; the deployment workflow already passes them to Vite. They are public project settings, not a private database password. Never expose a service-role or secret key in frontend code.
 4. For test staging, keep `VITE_ENABLE_DEMO_MODE=true`. For public onboarding, remove or set false and establish a privacy notice, verified-email settings, anti-abuse controls, account deletion, UK data-protection handling, and a secure review system.
 5. Test both role signups, email confirmation, sign-in, sign-out, denied cross-user reads (RLS), and that **verification cannot be changed by the user**.
 

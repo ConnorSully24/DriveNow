@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-const supabasePublicKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
+const supabasePublicKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() || import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 
 // Never place a Supabase service-role/secret key in the browser or a VITE_ variable.
 // When unconfigured, the account UI is a safe preview: no information is sent.
